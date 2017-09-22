@@ -6,8 +6,8 @@ Blue Robotics Thruster Commander hardware and software.
 
 The code can be compiled in the Arduino IDE version 1.0 and above. It requires the `attiny` board plugin by David Mellis, which can be installed with the Arduino Boards Manager. The following compile settings should be used:
 
-**Board:** ATtiny
-**Processor:** ATtiny44
-**Clock:** 8 Mhz (External)
+- **Board:** ATtiny
+- **Processor:** ATtiny44
+- **Clock:** 8 Mhz (External)
 
-**Programmer:** USBTinyISP (or whatever you're using)
+- **Programmer:** USBTinyISP (or whatever you're using)
