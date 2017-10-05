@@ -35,8 +35,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#include <Servo.h>
-
 // HARDWARE PIN DEFINITIONS
 #define INPUT_INT   A1
 #define INPUT_EXT0  A2
@@ -48,7 +46,12 @@ THE SOFTWARE.
 #define LED_EXT1    7
 #define DETECT      0
 
-Servo pwm0, pwm1;
+// PWM GENERATION DEFINITIONS
+#define PWM_FREQ    50                // Hz
+#define PERIOD      1000000/PWM_FREQ  // us
+#define PRESCALE    8                 // must match TCCR1B settings
+#define CLOCK_FREQ  8000000ul         // Hz
+#define CNT_PER_US  1                 // CLOCK_FREQ/PRESCALE/1000000 timer counts
 
 bool ext0IsConnected, ext1IsConnected;
 int pwmOut0, pwmOut1;
@@ -62,12 +65,13 @@ void setup() {
   pinMode(LED_INT,OUTPUT);
   pinMode(LED_EXT0,OUTPUT);
   pinMode(LED_EXT1,OUTPUT);
+  pinMode(PWM_0,OUTPUT);
+  pinMode(PWM_1,OUTPUT);
 
-  // Set up PWM outputs
-  pwm0.attach(PWM_0);
-  pwm1.attach(PWM_1);
-  pwm0.write(1500);
-  pwm1.write(1500);
+  // Initialize motor controllers
+  initializePWMController();
+  writePWM0(1500);
+  writePWM1(1500);
 
   // Detect what's connected
   detect();
@@ -101,7 +105,7 @@ void loop() {
   int steerMax = map(input_int,100,1023,0,400);
   pwmSteer = map(input_ext1,0,1023,-steerMax,steerMax);
   pwmBase = map(input_ext0,0,1023,1000,2000);
- 
+
   // Logic:
   // If both external inputs are connected:
   //   If the internal input is low, map outputs independently
@@ -129,12 +133,64 @@ void loop() {
     }
   }
 
-  pwm0.write(pwmOut0);
-  pwm1.write(pwmOut1);
+  // Set pwm outputs
+  writePWM0(pwmOut0);
+  writePWM1(pwmOut1);
 
   setLEDs();
 
   delay(50); // About 20 Hz update rate
+}
+
+void writePWM0(int pulsewidth) {
+  // Stop interrupts while changing pwm settings
+  cli();
+
+  // Set timer1 Output Compare Register A
+  // Set shut-off counter value to get pulsewidth us pulse
+  OCR1A = (pulsewidth * CNT_PER_US) - 1;
+
+  // Done setting timers -> allow interrupts again
+  sei();
+}
+
+void writePWM1(int pulsewidth) {
+  // Stop interrupts while changing pwm settings
+  cli();
+
+  // Set timer1 Output Compare Register B
+  // Set shut-off counter value to get pulsewidth us pulse
+  OCR1B = (pulsewidth * CNT_PER_US) - 1;
+
+  // Done setting timers -> allow interrupts again
+  sei();
+}
+
+void initializePWMController() {
+  // Stop interrupts while changing timer settings
+  cli();
+
+  // Set timer1 control register A/B/C
+  TCCR1A  = 0;
+  TCCR1B  = 0;
+  TCCR1C  = 0;
+
+  // Set non-inverting Fast PWM mode on A and B
+  TCCR1A |= (1 << COM1A1);
+  TCCR1A |= (1 << COM1B1);
+  // Set Fast PWM mode (compare to ICR1)
+  TCCR1A |= (1 << WGM11);
+  TCCR1B |= (1 << WGM12);
+  TCCR1B |= (1 << WGM13);
+  // Set timer1 clock source to prescaler 8
+  TCCR1B |= (1 << CS11);
+
+  // Set timer1 Input Capture Register
+  // Set end counter value to get a PWM_FREQ Hz timer
+  ICR1    = (PERIOD  * CNT_PER_US) - 1;
+
+  // Done setting timers -> allow interrupts again
+  sei();
 }
 
 void detect() {
