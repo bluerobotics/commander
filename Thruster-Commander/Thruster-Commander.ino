@@ -53,8 +53,23 @@ THE SOFTWARE.
 #define CLOCK_FREQ  8000000ul         // Hz
 #define CNT_PER_US  1                 // CLOCK_FREQ/PRESCALE/1000000 timer counts
 
-bool ext0IsConnected, ext1IsConnected;
-int pwmOut0, pwmOut1;
+// PWM OUTPUT CHARACTERISTICS
+#define PWM_MAX     2000              // us
+#define PWM_MIN     1000              // us
+#define PWM_NEUTRAL 1500              // us
+#define HALF_RANGE  500               // us
+#define DEADZONE    25                // us
+
+struct blinker_t {
+  unsigned long lastblink;  // timestamp (ms)
+  unsigned int  period;     // ms
+  int           pin;
+  bool          state;
+};
+
+bool      ext0IsConnected, ext1IsConnected;
+int       pwmOut0, pwmOut1;
+blinker_t leds[3];    // 0:ext0, 1:ext1, 2:int
 
 void setup() {
   // Set up pin modes
@@ -72,6 +87,9 @@ void setup() {
   initializePWMController();
   writePWM0(1500);
   writePWM1(1500);
+
+  // Initialize all 3 LEDs
+  initializeLEDs();
 
   // Detect what's connected
   detect();
@@ -225,29 +243,50 @@ void detect() {
   digitalWrite(DETECT,LOW);
 }
 
-void setLEDs() {
-  int period0, period1, periodAux;
-
+int pwmToBlinkPeriod(int pulsewidth) {
+  int period;
   // Set to solid at 1500 and flash faster in each direction
-  if ( pwmOut0 > 1525 ) {
-    period0 = map(pwmOut0,1525,2000,2000,200);
-  } else if ( pwmOut0 < 1475 ) {
-    period0 = map(pwmOut0,1475,1000,2000,200);
+  int blinkspeed = abs(pulsewidth - PWM_NEUTRAL);
+  if ( blinkspeed > DEADZONE ) {
+    period = map(blinkspeed,DEADZONE,HALF_RANGE,2000,200);
   } else {
-    period0 = 0xffff;
+    period = 0;
   }
+  return period;
+}
 
-  if ( pwmOut1 > 1525 ) {
-    period1 = map(pwmOut1,1525,2000,2000,200);
-  } else if ( pwmOut0 < 1475 ) {
-    period1 = map(pwmOut1,1475,1000,2000,200);
-  } else {
-    period1 = 0xffff;
+void initializeLEDs() {
+  leds[0].pin = LED_EXT0;
+  leds[1].pin = LED_EXT1;
+  leds[2].pin = LED_INT;
+
+  for ( int i = 0; i < 3; i++) {
+    leds[i].lastblink = 0;
+    leds[i].period    = 0;
+    leds[i].state     = 0;
   }
+}
 
-  // Implement flashing
-  digitalWrite(LED_EXT0,(millis()/(period0/2))%2);
-  digitalWrite(LED_EXT1,(millis()/(period1/2))%2);
-  //digitalWrite(LED_INT, (millis()/(periodAux/2))%2);
+void setLEDs() {
+  // Update LED periods
+  leds[0].period = pwmToBlinkPeriod(pwmOut0); // ext0
+  leds[1].period = pwmToBlinkPeriod(pwmOut1); // ext1
+//  leds[2].period = 1000;                      // int
+
+  // Blink each LED if necessary
+  for(int i=0; i<3; i++) {
+    if ( leds[i].period > 0 ) {
+      if ( millis() > leds[i].lastblink + leds[i].period/2 ) {
+        leds[i].lastblink = millis();
+        leds[i].state     = !leds[i].state;
+        digitalWrite(leds[i].pin, leds[i].state);
+      }
+    } else {
+      if ( !leds[i].state ) {
+        leds[i].state = true;
+        digitalWrite(leds[i].pin, HIGH);
+      }
+    }
+  }
 }
 
