@@ -68,6 +68,7 @@ struct blinker_t {
 };
 
 bool      ext0IsConnected, ext1IsConnected;
+
 int       pwmOut0, pwmOut1;
 blinker_t leds[3];    // 0:ext0, 1:ext1, 2:int
 
@@ -132,8 +133,8 @@ void loop() {
   // If neither is connected, map the internal input to both outputs
   if ( ext0IsConnected && ext1IsConnected ) {
     if ( isMixMode ) {
-      pwmOut0 = pwmBase+pwmSteer;
-      pwmOut1 = pwmBase-pwmSteer;
+      pwmOut0 = constrain(pwmBase+pwmSteer,PWM_MIN,PWM_MAX);;
+      pwmOut1 = constrain(pwmBase-pwmSteer,PWM_MIN,PWM_MAX);;
     } else {
       pwmOut0 = pwmExt0;
       pwmOut1 = pwmExt1;
@@ -164,6 +165,9 @@ void writePWM0(int pulsewidth) {
   // Stop interrupts while changing pwm settings
   cli();
 
+  // Constrain pulsewidth
+  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+
   // Set timer1 Output Compare Register A
   // Set shut-off counter value to get pulsewidth us pulse
   OCR1A = (pulsewidth * CNT_PER_US) - 1;
@@ -175,6 +179,9 @@ void writePWM0(int pulsewidth) {
 void writePWM1(int pulsewidth) {
   // Stop interrupts while changing pwm settings
   cli();
+
+  // Constrain pulsewidth
+  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
 
   // Set timer1 Output Compare Register B
   // Set shut-off counter value to get pulsewidth us pulse
@@ -245,6 +252,8 @@ void detect() {
 
 int pwmToBlinkPeriod(int pulsewidth) {
   int period;
+  // Constrain pulsewidth
+  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
   // Set to solid at 1500 and flash faster in each direction
   int blinkspeed = abs(pulsewidth - PWM_NEUTRAL);
   if ( blinkspeed > DEADZONE ) {
