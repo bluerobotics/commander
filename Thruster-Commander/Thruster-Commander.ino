@@ -89,8 +89,8 @@ void loop() {
 
   // Map standard inputs to 1000-2000 µs range
   pwmInt  = map(input_int,0,1023,1000,2000);
-  pwmExt0 = map(input_ext0,0,1023,1000,2000);
-  pwmExt1 = map(input_ext1,0,1023,1000,2000);
+  pwmExt0 = map(input_ext0 - EXT_OFFSET,0,1023,1000,2000);  // ext has offset
+  pwmExt1 = map(input_ext1 - EXT_OFFSET,0,1023,1000,2000);  // ext has offset
 
   // Map mixed inputs for mixing mode
   bool isMixMode = input_int > 100;

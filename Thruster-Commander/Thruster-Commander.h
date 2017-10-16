@@ -64,6 +64,7 @@ THE SOFTWARE.
 #define PWM_NEUTRAL 1500              // us
 #define HALF_RANGE  500               // us
 #define DEADZONE    25                // us
+#define EXT_OFFSET  -12               // adc counts
 
 
 #endif
