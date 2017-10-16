@@ -7597,11 +7597,11 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <instance part="GND5" gate="1" x="30.48" y="91.44"/>
 <instance part="Y1" gate="G$1" x="114.3" y="119.38" rot="R90"/>
 <instance part="GND6" gate="1" x="127" y="114.3"/>
-<instance part="LED2" gate="G$1" x="60.96" y="38.1"/>
-<instance part="R5" gate="G$1" x="60.96" y="25.4" rot="R90"/>
+<instance part="LED2" gate="G$1" x="60.96" y="25.4"/>
+<instance part="R5" gate="G$1" x="60.96" y="35.56" rot="R90"/>
 <instance part="GND1" gate="1" x="60.96" y="15.24"/>
-<instance part="LED3" gate="G$1" x="76.2" y="38.1"/>
-<instance part="R6" gate="G$1" x="76.2" y="25.4" rot="R90"/>
+<instance part="LED3" gate="G$1" x="76.2" y="25.4"/>
+<instance part="R6" gate="G$1" x="76.2" y="35.56" rot="R90"/>
 <instance part="GND7" gate="1" x="76.2" y="15.24"/>
 <instance part="C4" gate="G$1" x="78.74" y="160.02"/>
 <instance part="U5" gate="G$1" x="55.88" y="167.64"/>
@@ -7707,13 +7707,13 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <wire x1="127" y1="119.38" x2="127" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 <segment>
+<pinref part="LED2" gate="G$1" pin="C"/>
 <pinref part="GND1" gate="1" pin="GND"/>
-<pinref part="R5" gate="G$1" pin="1"/>
-<wire x1="60.96" y1="17.78" x2="60.96" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="20.32" x2="60.96" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="GND7" gate="1" pin="GND"/>
-<pinref part="R6" gate="G$1" pin="1"/>
+<pinref part="LED3" gate="G$1" pin="C"/>
 <wire x1="76.2" y1="17.78" x2="76.2" y2="20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -7758,16 +7758,6 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <label x="63.5" y="73.66" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="IN_EXT0" gate="G$1" pin="2"/>
-<wire x1="177.8" y1="144.78" x2="187.96" y2="144.78" width="0.1524" layer="91"/>
-<label x="187.96" y="144.78" size="1.778" layer="95" rot="MR0"/>
-</segment>
-<segment>
-<wire x1="215.9" y1="144.78" x2="226.06" y2="144.78" width="0.1524" layer="91"/>
-<pinref part="IN_EXT1" gate="G$1" pin="2"/>
-<label x="226.06" y="144.78" size="1.778" layer="95" rot="MR0"/>
-</segment>
-<segment>
 <pinref part="C3" gate="G$1" pin="1"/>
 <wire x1="25.4" y1="35.56" x2="25.4" y2="48.26" width="0.1524" layer="91"/>
 <label x="25.4" y="45.72" size="1.778" layer="95"/>
@@ -7782,12 +7772,15 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <wire x1="114.3" y1="139.7" x2="114.3" y2="144.78" width="0.1524" layer="91"/>
 <label x="114.3" y="142.24" size="1.778" layer="95"/>
 </segment>
-</net>
-<net name="PWM2" class="0">
 <segment>
-<pinref part="AVR_ICSP" gate="G$1" pin="1"/>
-<wire x1="38.1" y1="73.66" x2="25.4" y2="73.66" width="0.1524" layer="91"/>
-<label x="25.4" y="73.66" size="1.778" layer="95"/>
+<pinref part="IN_EXT1" gate="G$1" pin="3"/>
+<wire x1="215.9" y1="147.32" x2="231.14" y2="147.32" width="0.1524" layer="91"/>
+<label x="231.14" y="147.32" size="1.778" layer="95" rot="MR0"/>
+</segment>
+<segment>
+<pinref part="IN_EXT0" gate="G$1" pin="3"/>
+<wire x1="177.8" y1="147.32" x2="193.04" y2="147.32" width="0.1524" layer="91"/>
+<label x="193.04" y="147.32" size="1.778" layer="95" rot="MR0"/>
 </segment>
 </net>
 <net name="RESET" class="0">
@@ -7811,22 +7804,12 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <label x="198.12" y="101.6" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="AVR_ICSP" gate="G$1" pin="3"/>
-<wire x1="38.1" y1="71.12" x2="25.4" y2="71.12" width="0.1524" layer="91"/>
-<label x="25.4" y="71.12" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="U$2" gate="G$1" pin="(PCINT1/AIN0/ADC1)PA1"/>
 <wire x1="86.36" y1="99.06" x2="106.68" y2="99.06" width="0.1524" layer="91"/>
 <label x="106.68" y="99.06" size="1.778" layer="95" rot="MR0"/>
 </segment>
 </net>
 <net name="INPUT_EXT1" class="0">
-<segment>
-<pinref part="IN_EXT1" gate="G$1" pin="3"/>
-<wire x1="215.9" y1="147.32" x2="231.14" y2="147.32" width="0.1524" layer="91"/>
-<label x="231.14" y="147.32" size="1.778" layer="95" rot="MR0"/>
-</segment>
 <segment>
 <pinref part="U$2" gate="G$1" pin="(PCINT3/T0/ADC3)PA3"/>
 <wire x1="86.36" y1="104.14" x2="106.68" y2="104.14" width="0.1524" layer="91"/>
@@ -7837,13 +7820,13 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <wire x1="124.46" y1="88.9" x2="142.24" y2="88.9" width="0.1524" layer="91"/>
 <label x="142.24" y="88.9" size="1.778" layer="95" rot="MR0"/>
 </segment>
+<segment>
+<wire x1="215.9" y1="144.78" x2="231.14" y2="144.78" width="0.1524" layer="91"/>
+<pinref part="IN_EXT1" gate="G$1" pin="2"/>
+<label x="231.14" y="144.78" size="1.778" layer="95" rot="MR0"/>
+</segment>
 </net>
 <net name="INPUT_EXT0" class="0">
-<segment>
-<pinref part="IN_EXT0" gate="G$1" pin="3"/>
-<wire x1="177.8" y1="147.32" x2="193.04" y2="147.32" width="0.1524" layer="91"/>
-<label x="193.04" y="147.32" size="1.778" layer="95" rot="MR0"/>
-</segment>
 <segment>
 <pinref part="U$2" gate="G$1" pin="(PCINT2/AIN1/ADC2)PA2"/>
 <wire x1="86.36" y1="101.6" x2="106.68" y2="101.6" width="0.1524" layer="91"/>
@@ -7853,6 +7836,11 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="124.46" y1="96.52" x2="142.24" y2="96.52" width="0.1524" layer="91"/>
 <label x="142.24" y="96.52" size="1.778" layer="95" rot="MR0"/>
+</segment>
+<segment>
+<pinref part="IN_EXT0" gate="G$1" pin="2"/>
+<wire x1="177.8" y1="144.78" x2="193.04" y2="144.78" width="0.1524" layer="91"/>
+<label x="193.04" y="144.78" size="1.778" layer="95" rot="MR0"/>
 </segment>
 </net>
 <net name="PWM0" class="0">
@@ -7871,13 +7859,13 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <wire x1="86.36" y1="111.76" x2="106.68" y2="111.76" width="0.1524" layer="91"/>
 <label x="106.68" y="111.76" size="1.778" layer="95" rot="MR0"/>
 </segment>
-</net>
-<net name="PWM1" class="0">
 <segment>
 <pinref part="AVR_ICSP" gate="G$1" pin="4"/>
 <wire x1="55.88" y1="71.12" x2="68.58" y2="71.12" width="0.1524" layer="91"/>
 <label x="63.5" y="71.12" size="1.778" layer="95"/>
 </segment>
+</net>
+<net name="PWM1" class="0">
 <segment>
 <pinref part="PWM1A" gate="G$1" pin="1"/>
 <wire x1="190.5" y1="53.34" x2="195.58" y2="53.34" width="0.1524" layer="91"/>
@@ -7892,6 +7880,11 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <pinref part="U$2" gate="G$1" pin="(PCINT5/OC1B/MISO/DO/ADC5)PA5"/>
 <wire x1="86.36" y1="109.22" x2="106.68" y2="109.22" width="0.1524" layer="91"/>
 <label x="106.68" y="109.22" size="1.778" layer="95" rot="MR0"/>
+</segment>
+<segment>
+<pinref part="AVR_ICSP" gate="G$1" pin="1"/>
+<wire x1="38.1" y1="73.66" x2="25.4" y2="73.66" width="0.1524" layer="91"/>
+<label x="25.4" y="73.66" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -7924,7 +7917,7 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <label x="106.68" y="114.3" size="1.778" layer="95" rot="MR0"/>
 </segment>
 <segment>
-<pinref part="LED3" gate="G$1" pin="A"/>
+<pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="76.2" y1="40.64" x2="76.2" y2="48.26" width="0.1524" layer="91"/>
 <label x="76.2" y="45.72" size="1.778" layer="95"/>
 </segment>
@@ -7936,7 +7929,7 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <label x="106.68" y="124.46" size="1.778" layer="95" rot="MR0"/>
 </segment>
 <segment>
-<pinref part="LED2" gate="G$1" pin="A"/>
+<pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="60.96" y1="40.64" x2="60.96" y2="48.26" width="0.1524" layer="91"/>
 <label x="60.96" y="45.72" size="1.778" layer="95"/>
 </segment>
@@ -7951,6 +7944,11 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 <pinref part="LED1" gate="G$1" pin="A"/>
 <wire x1="45.72" y1="40.64" x2="45.72" y2="48.26" width="0.1524" layer="91"/>
 <label x="45.72" y="45.72" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="AVR_ICSP" gate="G$1" pin="3"/>
+<wire x1="38.1" y1="71.12" x2="25.4" y2="71.12" width="0.1524" layer="91"/>
+<label x="25.4" y="71.12" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="DETECT" class="0">
@@ -7968,16 +7966,16 @@ Small SMD resonator. This is the itty bitty 10/20MHz resonators with built in ca
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="R5" gate="G$1" pin="2"/>
-<pinref part="LED2" gate="G$1" pin="C"/>
-<wire x1="60.96" y1="30.48" x2="60.96" y2="33.02" width="0.1524" layer="91"/>
+<pinref part="R5" gate="G$1" pin="1"/>
+<pinref part="LED2" gate="G$1" pin="A"/>
+<wire x1="60.96" y1="30.48" x2="60.96" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$5" class="0">
 <segment>
-<pinref part="R6" gate="G$1" pin="2"/>
-<pinref part="LED3" gate="G$1" pin="C"/>
-<wire x1="76.2" y1="30.48" x2="76.2" y2="33.02" width="0.1524" layer="91"/>
+<pinref part="LED3" gate="G$1" pin="A"/>
+<pinref part="R6" gate="G$1" pin="1"/>
+<wire x1="76.2" y1="27.94" x2="76.2" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
