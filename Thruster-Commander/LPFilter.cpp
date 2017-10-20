@@ -1,7 +1,7 @@
 /* Blue Robotics Thruster Commander Firmware
 -----------------------------------------------------
 
-Title: Blue Robotics Thruster Commander Firmware
+Title: Blue Robotics Thruster Commander Firmware - Low-Pass Filter
 
 Description: This code is the default firmware for the Blue Robotics
 Thruster Commander, which provides a simple interface to control a
@@ -35,44 +35,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#ifndef THRUSTER-COMMANDER
-#define THRUSTER-COMMANDER
-
-#include <Arduino.h>
-
-#include "Servo-Driver.h"
-#include "Blinker.h"
 #include "LPFilter.h"
 
-// HARDWARE PIN DEFINITIONS
-#define INPUT_INT   A1
-#define INPUT_EXT0  A2
-#define INPUT_EXT1  A3
-#define PWM_0       6
-#define PWM_1       5
-#define LED_INT     4
-#define LED_EXT0    8
-#define LED_EXT1    7
-#define DETECT      0
+//////////////////
+// Constructors //
+//////////////////
 
-// PWM GENERATION DEFINITIONS
-#define PWM_FREQ    50                // Hz
-#define PERIOD      1000000/PWM_FREQ  // us
-#define PRESCALE    8                 // must match TCCR1B settings
-#define CLOCK_FREQ  8000000ul         // Hz
-#define CNT_PER_US  1                 // CLOCK_FREQ/PRESCALE/1000000 timer counts
+// Default Constructor
+LPFilter::LPFilter() {}
 
-// PWM OUTPUT CHARACTERISTICS
-#define PWM_MAX     2000              // us
-#define PWM_MIN     1000              // us
-#define PWM_NEUTRAL 1500              // us
-#define HALF_RANGE  500               // us
-#define DEADZONE    25                // us
-#define EXT_OFFSET  -12               // adc counts
+// Constructor
+LPFilter::LPFilter(float dt, float tau, float prefill)
+{
+  _dt   = dt;
+  _tau  = tau;
 
-// LOW-PASS FILTER
-#define UPDATE_FREQ 20.0f             // Hz
-#define CUTOFF_FREQ 0.5f              // Hz
+  _input  = prefill;
+  _output = prefill;
+}
+
+// Destructor
+LPFilter::~LPFilter() {} // Nothing to destruct
 
 
-#endif
+////////////////////
+// Public Methods //
+////////////////////
+
+// Move filter along one timestep, return filtered output
+float LPFilter::step(float input)
+{
+  // Update input
+  _input = input;
+
+  // Initialize output value
+  float output = 0;
+
+  // Run filter
+  // Handle input
+  output += _dt/_tau*_input;
+
+  // Handle output
+  output -= (_dt/_tau - 1)*_output;
+
+  // Save latest output
+  _output = output;
+
+  return output;
+}
+

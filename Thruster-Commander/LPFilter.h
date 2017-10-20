@@ -1,7 +1,7 @@
 /* Blue Robotics Thruster Commander Firmware
 -----------------------------------------------------
 
-Title: Blue Robotics Thruster Commander Firmware
+Title: Blue Robotics Thruster Commander Firmware - Low-Pass Filter
 
 Description: This code is the default firmware for the Blue Robotics
 Thruster Commander, which provides a simple interface to control a
@@ -34,45 +34,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
+#ifndef LPFILTER
+#define LPFILTER
 
-#ifndef THRUSTER-COMMANDER
-#define THRUSTER-COMMANDER
+class LPFilter
+{
+  public:
+    LPFilter();
+    LPFilter(float dt, float tau, float prefill);
+    ~LPFilter();
+    float step(float input);
 
-#include <Arduino.h>
+  private:
+    float _dt;                  // s
+    float _tau;                 // s
 
-#include "Servo-Driver.h"
-#include "Blinker.h"
-#include "LPFilter.h"
-
-// HARDWARE PIN DEFINITIONS
-#define INPUT_INT   A1
-#define INPUT_EXT0  A2
-#define INPUT_EXT1  A3
-#define PWM_0       6
-#define PWM_1       5
-#define LED_INT     4
-#define LED_EXT0    8
-#define LED_EXT1    7
-#define DETECT      0
-
-// PWM GENERATION DEFINITIONS
-#define PWM_FREQ    50                // Hz
-#define PERIOD      1000000/PWM_FREQ  // us
-#define PRESCALE    8                 // must match TCCR1B settings
-#define CLOCK_FREQ  8000000ul         // Hz
-#define CNT_PER_US  1                 // CLOCK_FREQ/PRESCALE/1000000 timer counts
-
-// PWM OUTPUT CHARACTERISTICS
-#define PWM_MAX     2000              // us
-#define PWM_MIN     1000              // us
-#define PWM_NEUTRAL 1500              // us
-#define HALF_RANGE  500               // us
-#define DEADZONE    25                // us
-#define EXT_OFFSET  -12               // adc counts
-
-// LOW-PASS FILTER
-#define UPDATE_FREQ 20.0f             // Hz
-#define CUTOFF_FREQ 0.5f              // Hz
-
+    float _input;
+    float _output;
+};
 
 #endif
