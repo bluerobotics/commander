@@ -36,13 +36,12 @@ THE SOFTWARE.
 -------------------------------*/
 
 #include "Thruster-Commander.h"
-#include "Servo-Driver.h"
-#include "Blinker.h"
 
 // Global Variable Declaration
 bool      ext0IsConnected, ext1IsConnected;
 int       pwmOut0, pwmOut1;
 blinker_t leds[3];    // 0:ext0, 1:ext1, 2:int
+LPFilter  filter0, filter1;
 
 
 void setup() {
@@ -61,6 +60,10 @@ void setup() {
   initializePWMController();
   writePWM0(1500);
   writePWM1(1500);
+
+  // Initialize low-pass filters
+  filter0 = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
+  filter1 = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
 
   // Initialize all 3 LEDs
   initializeLEDs(leds);
@@ -125,13 +128,17 @@ void loop() {
     }
   }
 
+  // Run pwm outputs through filters
+  pwmOut0 = filter0.step(pwmOut0);
+  pwmOut1 = filter1.step(pwmOut1);
+  
   // Set pwm outputs
   writePWM0(pwmOut0);
   writePWM1(pwmOut1);
 
   setLEDs(leds, pwmOut0, pwmOut1);
 
-  delay(50); // About 20 Hz update rate
+  delay(1.0f/UPDATE_FREQ);   // set update rate
 }
 
 
