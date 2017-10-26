@@ -148,14 +148,6 @@ void detect() {
   // Detect what's connected by driving lines through 100k resistors
   int inL[2], inR[2], inSPD[2], inSTR[2];   // 0:low, 1:high
 
-  // Drive both inputs low, wait, and log values
-  digitalWrite(DETECT,LOW);
-  delay(100);
-  inL[0]   = analogRead(INPUT_L);
-  inR[0]   = analogRead(INPUT_R);
-  inSPD[0] = analogRead(INPUT_SPD);
-  inSTR[0] = analogRead(INPUT_STR);
-
   // Drive both inputs high, wait, and log values
   digitalWrite(DETECT,HIGH);
   delay(100);
@@ -164,30 +156,17 @@ void detect() {
   inSPD[1] = analogRead(INPUT_SPD);
   inSTR[1] = analogRead(INPUT_STR);
 
-  // If inputs follow, potentiometer is disconnected, otherwise it's connected
-  if ( inL[0] < 5 && inL[1] > 1018 ) {
-    inLIsConnected = false;
-  } else {
-    inLIsConnected = true;
-  }
-
-  if ( inR[0] < 5 && inR[1] > 1018 ) {
-    inRIsConnected = false;
-  } else {
-    inRIsConnected = true;
-  }
-
-  if ( inSPD[0] < 5 && inSPD[1] > 1018 ) {
-    inSPDIsConnected = false;
-  } else {
-    inSPDIsConnected = true;
-  }
-
-  if ( inSTR[0] < 5 && inSTR[1] > 1018 ) {
-    inSTRIsConnected = false;
-  } else {
-    inSTRIsConnected = true;
-  }
-
+  // Drive both inputs low, wait, and log values
   digitalWrite(DETECT,LOW);
+  delay(100);
+  inL[0]   = analogRead(INPUT_L);
+  inR[0]   = analogRead(INPUT_R);
+  inSPD[0] = analogRead(INPUT_SPD);
+  inSTR[0] = analogRead(INPUT_STR);
+
+  // If inputs follow, potentiometer is disconnected, otherwise it's connected
+  inLIsConnected   = !( inL[0]   < DETECT_LOW && inL[1]   > DETECT_HIGH );
+  inRIsConnected   = !( inR[0]   < DETECT_LOW && inR[1]   > DETECT_HIGH );
+  inSPDIsConnected = !( inSPD[0] < DETECT_LOW && inSPD[1] > DETECT_HIGH );
+  inSTRIsConnected = !( inSTR[0] < DETECT_LOW && inSTR[1] > DETECT_HIGH );
 }
