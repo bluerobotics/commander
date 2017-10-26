@@ -38,10 +38,11 @@ THE SOFTWARE.
 #ifndef SERVO-DRIVER
 #define SERVO-DRIVER
 
-// Function Declarations
-void writePWML(int pulsewidth);
-void writePWMR(int pulsewidth);
-void initializePWMController();
+#define OC1A_PIN  6
+#define OC1B_PIN  5
 
+// Function Declarations
+void writePWM(int pin, int pulsewidth);
+void initializePWMController();
 
 #endif
