@@ -68,10 +68,6 @@ THE SOFTWARE.
 #define DEADZONE    25                // us
 #define POT_OFFSET  -12               // adc counts
 
-// LOW-PASS FILTER
-#define UPDATE_FREQ 20.0f             // Hz
-#define CUTOFF_FREQ 0.5f              // Hz
-
 // DETECT PARAMETERS
 #define DETECT_LOW  5                 // adc counts
 #define DETECT_HIGH 1018              // adc counts

@@ -36,22 +36,17 @@ THE SOFTWARE.
 -------------------------------*/
 
 #include "LPFilter.h"
+#include "Thruster-Commander.h"
 
 //////////////////
 // Constructors //
 //////////////////
 
 // Default Constructor
-LPFilter::LPFilter() {}
-
-// Constructor
-LPFilter::LPFilter(float dt, float tau, float prefill)
+LPFilter::LPFilter()
 {
-  _dt   = dt;
-  _tau  = tau;
-
-  _input  = prefill;
-  _output = prefill;
+  _input  = PWM_NEUTRAL;
+  _output = PWM_NEUTRAL;
 }
 
 // Destructor
@@ -73,10 +68,10 @@ float LPFilter::step(float input)
 
   // Run filter
   // Handle input
-  output += _dt/_tau*_input;
+  output += DT/TAU*_input;
 
   // Handle output
-  output -= (_dt/_tau - 1)*_output;
+  output -= (DT/TAU - 1)*_output;
 
   // Save latest output
   _output = output;
