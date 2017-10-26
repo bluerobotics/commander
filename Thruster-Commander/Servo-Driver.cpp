@@ -36,23 +36,9 @@ THE SOFTWARE.
 -------------------------------*/
 
 #include "Servo-Driver.h"
+#include "Thruster-Commander.h"
 
-void writePWM0(int pulsewidth) {
-  // Stop interrupts while changing pwm settings
-  cli();
-
-  // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
-
-  // Set timer1 Output Compare Register A
-  // Set shut-off counter value to get pulsewidth us pulse
-  OCR1A = (pulsewidth * CNT_PER_US) - 1;
-
-  // Done setting timers -> allow interrupts again
-  sei();
-}
-
-void writePWM1(int pulsewidth) {
+void writePWML(int pulsewidth) {
   // Stop interrupts while changing pwm settings
   cli();
 
@@ -62,6 +48,21 @@ void writePWM1(int pulsewidth) {
   // Set timer1 Output Compare Register B
   // Set shut-off counter value to get pulsewidth us pulse
   OCR1B = (pulsewidth * CNT_PER_US) - 1;
+
+  // Done setting timers -> allow interrupts again
+  sei();
+}
+
+void writePWMR(int pulsewidth) {
+  // Stop interrupts while changing pwm settings
+  cli();
+
+  // Constrain pulsewidth
+  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+
+  // Set timer1 Output Compare Register A
+  // Set shut-off counter value to get pulsewidth us pulse
+  OCR1A = (pulsewidth * CNT_PER_US) - 1;
 
   // Done setting timers -> allow interrupts again
   sei();
