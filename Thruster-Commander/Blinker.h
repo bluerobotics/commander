@@ -38,8 +38,6 @@ THE SOFTWARE.
 #ifndef BLINKER
 #define BLINKER
 
-#include "Thruster-Commander.h"
-
 // Struct Type Definition
 struct blinker_t {
   unsigned long lastblink;  // timestamp (ms)
@@ -51,6 +49,6 @@ struct blinker_t {
 // Function Declaration
 int  pwmToBlinkPeriod(int pulsewidth);
 void initializeLEDs(blinker_t leds[]);
-void setLEDs(blinker_t leds[], int pwmOut0, int pwmOut1);
+void setLEDs(blinker_t leds[], int pwmOutL, int pwmOutR);
 
 #endif

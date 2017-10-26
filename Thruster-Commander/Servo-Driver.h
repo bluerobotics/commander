@@ -38,11 +38,9 @@ THE SOFTWARE.
 #ifndef SERVO-DRIVER
 #define SERVO-DRIVER
 
-#include "Thruster-Commander.h"
-
 // Function Declarations
-void writePWM0(int pulsewidth);
-void writePWM1(int pulsewidth);
+void writePWML(int pulsewidth);
+void writePWMR(int pulsewidth);
 void initializePWMController();
 
 

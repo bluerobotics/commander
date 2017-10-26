@@ -40,19 +40,16 @@ THE SOFTWARE.
 
 #include <Arduino.h>
 
-#include "Servo-Driver.h"
-#include "Blinker.h"
-#include "LPFilter.h"
-
 // HARDWARE PIN DEFINITIONS
-#define INPUT_INT   A1
-#define INPUT_EXT0  A2
-#define INPUT_EXT1  A3
-#define PWM_0       6
-#define PWM_1       5
-#define LED_INT     4
-#define LED_EXT0    8
-#define LED_EXT1    7
+#define INPUT_L     A3  // Left In
+#define INPUT_R     A2  // Right In
+#define INPUT_SPD   A3  // Speed
+#define INPUT_STR   A1  // Steering
+#define SWITCH      4
+#define PWM_L       5
+#define PWM_R       6
+#define LED_L       8
+#define LED_R       7
 #define DETECT      0
 
 // PWM GENERATION DEFINITIONS
@@ -66,9 +63,10 @@ THE SOFTWARE.
 #define PWM_MAX     2000              // us
 #define PWM_MIN     1000              // us
 #define PWM_NEUTRAL 1500              // us
+#define STEER_MAX   400               // us
 #define HALF_RANGE  500               // us
 #define DEADZONE    25                // us
-#define EXT_OFFSET  -12               // adc counts
+#define POT_OFFSET  -12               // adc counts
 
 // LOW-PASS FILTER
 #define UPDATE_FREQ 20.0f             // Hz

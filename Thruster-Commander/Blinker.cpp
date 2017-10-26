@@ -36,6 +36,7 @@ THE SOFTWARE.
 -------------------------------*/
 
 #include "Blinker.h"
+#include "Thruster-Commander.h"
 
 int pwmToBlinkPeriod(int pulsewidth) {
   int period;
@@ -52,24 +53,23 @@ int pwmToBlinkPeriod(int pulsewidth) {
 }
 
 void initializeLEDs(blinker_t leds[]) {
-  leds[0].pin = LED_EXT0;
-  leds[1].pin = LED_EXT1;
-  leds[2].pin = LED_INT;
+  leds[0].pin = LED_L;
+  leds[1].pin = LED_R;
 
-  for ( int i = 0; i < 3; i++) {
+  for ( int i = 0; i < 2; i++) {
     leds[i].lastblink = 0;
     leds[i].period    = 0;
     leds[i].state     = 0;
   }
 }
 
-void setLEDs(blinker_t leds[], int pwmOut0, int pwmOut1) {
+void setLEDs(blinker_t leds[], int pwmOutL, int pwmOutR) {
   // Update LED periods
-  leds[0].period = pwmToBlinkPeriod(pwmOut0); // ext0
-  leds[1].period = pwmToBlinkPeriod(pwmOut1); // ext1
+  leds[0].period = pwmToBlinkPeriod(pwmOutL); // left
+  leds[1].period = pwmToBlinkPeriod(pwmOutR); // right
 
   // Blink each LED if necessary
-  for(int i=0; i<3; i++) {
+  for(int i=0; i<2; i++) {
     if ( leds[i].period > 0 ) {
       if ( millis() > leds[i].lastblink + leds[i].period/2 ) {
         leds[i].lastblink = millis();
