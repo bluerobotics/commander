@@ -63,8 +63,8 @@ void setup() {
 
   // Initialize motor controllers
   initializePWMController();
-  writePWML(PWM_NEUTRAL);
-  writePWMR(PWM_NEUTRAL);
+  writePWM(PWM_L, PWM_NEUTRAL);
+  writePWM(PWM_R, PWM_NEUTRAL);
 
   // Initialize low-pass filters
   filterL = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
@@ -135,8 +135,8 @@ void loop() {
   pwmOutR = filterR.step(pwmOutR);
 
   // Set pwm outputs
-  writePWML(pwmOutL);
-  writePWMR(pwmOutR);
+  writePWM(PWM_L, pwmOutL);
+  writePWM(PWM_R, pwmOutR);
 
   setLEDs(leds, pwmOutL, pwmOutR);
 
