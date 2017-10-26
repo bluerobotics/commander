@@ -38,13 +38,11 @@ THE SOFTWARE.
 #include "Thruster-Commander.h"
 
 #include "Servo-Driver.h"
-#include "Blinker.h"
+#include "Indicator.h"
 #include "LPFilter.h"
 
 // Global Variable Declaration
 bool      inLIsConnected, inRIsConnected, inSPDIsConnected, inSTRIsConnected;
-int       pwmOutL, pwmOutR;
-blinker_t leds[2];    // 0:left, 1:right
 LPFilter  filterL, filterR;
 uint32_t  schedulePWM, scheduleDetect;
 
@@ -57,10 +55,10 @@ void setup() {
   pinMode(INPUT_STR,INPUT);
   pinMode(SWITCH,INPUT);
   pinMode(DETECT,OUTPUT);
-  pinMode(LED_L,OUTPUT);
-  pinMode(LED_R,OUTPUT);
   pinMode(PWM_L,OUTPUT);
   pinMode(PWM_R,OUTPUT);
+  pinMode(LED_L,OUTPUT);
+  pinMode(LED_R,OUTPUT);
 
   // Initialize motor controllers
   initializePWMController();
@@ -68,7 +66,8 @@ void setup() {
   writePWM(PWM_R, PWM_NEUTRAL);
 
   // Initialize LEDs
-  initializeLEDs(leds);
+  initializeLEDs();
+  writeBlinker(BLINK_S);
 
   // Detect what's connected
   detect();
@@ -85,7 +84,9 @@ void loop() {
   // Update PWM signals
   if (millis() > schedulePWM) {
     int pwmL, pwmR, pwmSPD, pwmSTR;
+    int pwmOutL, pwmOutR;
     int inputL, inputR, inputSPD, inputSTR, inputSWITCH;
+    uint16_t errorPtrn = 0;
 
     // Schedule the next PWM time
     schedulePWM = millis() + FILTER_DT*1000;
@@ -130,10 +131,15 @@ void loop() {
       } else if ( inRIsConnected ) {
         pwmOutL = pwmR;
         pwmOutR = pwmR;
+      } else {
+        pwmOutL   = PWM_NEUTRAL;
+        pwmOutR   = PWM_NEUTRAL;
+        errorPtrn = BLINK_2S;
       }
     } else {
-      pwmOutL = PWM_NEUTRAL;
-      pwmOutR = PWM_NEUTRAL;
+      pwmOutL   = PWM_NEUTRAL;
+      pwmOutR   = PWM_NEUTRAL;
+      errorPtrn = BLINK_1L;
     }
 
     // Run pwm outputs through filters
@@ -144,7 +150,18 @@ void loop() {
     writePWM(PWM_L, pwmOutL);
     writePWM(PWM_R, pwmOutR);
 
-  setLEDs(leds, pwmOutL, pwmOutR);
+    // Set LEDs
+    if (errorPtrn == 0) {
+      // No errors, display dimmer value
+      writeDimmer(LED_L, pwmOutL);
+      writeDimmer(LED_R, pwmOutR);
+    } else {
+      // display error pattern
+      writeBlinker(errorPtrn);
+    }
+
+    return;
+  }
 
   // Update detect
   if (millis() > scheduleDetect) {

@@ -42,8 +42,9 @@ void writePWM(int pin, int pulsewidth) {
   // Stop interrupts while changing pwm settings
   cli();
 
-  // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+  // Constrain pulsewidth to pwm range if > 0, otherwise set to neutral
+  pulsewidth = (pulsewidth > 0) ? constrain(pulsewidth, PWM_MIN, PWM_MAX)
+                                : PWM_NEUTRAL;
 
   if ( pin == OC1A_PIN ) {
     // Set timer1 Output Compare Register A
