@@ -38,17 +38,23 @@ THE SOFTWARE.
 #ifndef BLINKER
 #define BLINKER
 
-// Struct Type Definition
-struct blinker_t {
-  unsigned long lastblink;  // timestamp (ms)
-  unsigned int  period;     // ms
-  int           pin;
-  bool          state;
-};
+// BLINKER CHARACTERISTICS
+#define PERIOD_MIN  200               // ms
+#define PERIOD_MAX  2000              // ms
 
-// Function Declaration
-int  pwmToBlinkPeriod(int pulsewidth);
-void initializeLEDs(blinker_t leds[]);
-void setLEDs(blinker_t leds[], int pwmOutL, int pwmOutR);
+
+class Blinker
+{
+  public:
+    Blinker();
+    Blinker(int pin); // us
+    ~Blinker();
+    void setPWM(int pulsewidth);    // us
+
+  private:
+    unsigned long _lastblink;   // timestamp (ms)
+    int           _pin;
+    bool          _state;
+};
 
 #endif

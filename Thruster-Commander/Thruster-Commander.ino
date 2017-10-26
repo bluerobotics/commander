@@ -44,7 +44,7 @@ THE SOFTWARE.
 // Global Variable Declaration
 bool      inLIsConnected, inRIsConnected, inSPDIsConnected, inSTRIsConnected;
 int       pwmOutL, pwmOutR;
-blinker_t leds[2];    // 0:left, 1:right
+Blinker   ledL, ledR;
 LPFilter  filterL, filterR;
 
 
@@ -56,8 +56,6 @@ void setup() {
   pinMode(INPUT_STR,INPUT);
   pinMode(SWITCH,INPUT);
   pinMode(DETECT,OUTPUT);
-  pinMode(LED_L,OUTPUT);
-  pinMode(LED_R,OUTPUT);
   pinMode(PWM_L,OUTPUT);
   pinMode(PWM_R,OUTPUT);
 
@@ -67,7 +65,8 @@ void setup() {
   writePWM(PWM_R, PWM_NEUTRAL);
 
   // Initialize LEDs
-  initializeLEDs(leds);
+  ledL = Blinker(LED_L);
+  ledR = Blinker(LED_R);
 
   // Detect what's connected
   detect();
@@ -134,7 +133,9 @@ void loop() {
   writePWM(PWM_L, pwmOutL);
   writePWM(PWM_R, pwmOutR);
 
-  setLEDs(leds, pwmOutL, pwmOutR);
+  // Set LEDs
+  ledL.setPWM(pwmOutL);
+  ledR.setPWM(pwmOutR);
 
   delay(DT);   // set update rate
 }
