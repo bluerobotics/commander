@@ -102,7 +102,7 @@ void loop() {
   pwmSTR = map(inputSTR - POT_OFFSET,0,1023,-STEER_MAX,STEER_MAX);
 
   // Logic:
-  // If SWITCH is not pulled low (turned off):
+  // If SWITCH is pulled low (enabled):
   //   If both L and R are connected:
   //     L controls pwmOutL, R controls pwmOutR
   //   If both SPD and STR are connected:
@@ -111,7 +111,7 @@ void loop() {
   //     L controls both pwmOutL and pwmOutR
   //   If only R is connected:
   //     R controls both pwmOutL and pwmOutR
-  if ( inputSWITCH == HIGH ) {
+  if ( inputSWITCH == LOW ) {
     if ( inLIsConnected && inRIsConnected ) {
       pwmOutL = pwmL;
       pwmOutR = pwmR;
