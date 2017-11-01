@@ -37,18 +37,19 @@ THE SOFTWARE.
 #ifndef LPFILTER
 #define LPFILTER
 
+// LOW-PASS FILTER
+#define DT          0.050f            // s
+#define TAU         2.0f              // s
+
+
 class LPFilter
 {
   public:
     LPFilter();
-    LPFilter(float dt, float tau, float prefill);
     ~LPFilter();
     float step(float input);
 
   private:
-    float _dt;                  // s
-    float _tau;                 // s
-
     float _input;
     float _output;
 };

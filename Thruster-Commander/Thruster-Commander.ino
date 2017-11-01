@@ -66,10 +66,6 @@ void setup() {
   writePWM(PWM_L, PWM_NEUTRAL);
   writePWM(PWM_R, PWM_NEUTRAL);
 
-  // Initialize low-pass filters
-  filterL = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
-  filterR = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
-
   // Initialize LEDs
   initializeLEDs(leds);
 
@@ -140,7 +136,7 @@ void loop() {
 
   setLEDs(leds, pwmOutL, pwmOutR);
 
-  delay(1.0f/UPDATE_FREQ);   // set update rate
+  delay(DT);   // set update rate
 }
 
 
