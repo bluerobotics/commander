@@ -38,49 +38,50 @@ THE SOFTWARE.
 #include "Blinker.h"
 #include "Thruster-Commander.h"
 
-int pwmToBlinkPeriod(int pulsewidth) {
-  int period;
-  // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
-  // Set to solid at 1500 and flash faster in each direction
+//////////////////
+// Constructors //
+//////////////////
+
+// Default Constructor - not sure why you'd use this, as there are no setters
+Blinker::Blinker() {}
+
+// Useful Constructor
+Blinker::Blinker(int pin) {
+  _pin        = pin;
+
+  _lastblink  = 0;
+  _state      = 0;
+
+  // Make sure we can use the pin as an output
+  pinMode(_pin, OUTPUT);
+}
+
+// Destructor
+Blinker::~Blinker() {}
+
+
+////////////////////
+// Public Methods //
+////////////////////
+
+// Set blink based on pulse width input [ms]
+void Blinker::setPWM(int pulsewidth) {
+  // Update LED periods
+  unsigned int period = 0;
+
+  // Blink if period is nonzero, otherwise stay on
   int blinkspeed = abs(pulsewidth - PWM_NEUTRAL);
   if ( blinkspeed > DEADZONE ) {
-    period = map(blinkspeed,DEADZONE,HALF_RANGE,2000,200);
+    period = map(blinkspeed, DEADZONE, HALF_RANGE, PERIOD_MAX, PERIOD_MIN);
+    if ( millis() > _lastblink + period/2 ) {
+      _lastblink = millis();
+      _state     = !_state;
+      digitalWrite(_pin, _state);
+    }
   } else {
-    period = 0;
-  }
-  return period;
-}
-
-void initializeLEDs(blinker_t leds[]) {
-  leds[0].pin = LED_L;
-  leds[1].pin = LED_R;
-
-  for ( int i = 0; i < 2; i++) {
-    leds[i].lastblink = 0;
-    leds[i].period    = 0;
-    leds[i].state     = 0;
-  }
-}
-
-void setLEDs(blinker_t leds[], int pwmOutL, int pwmOutR) {
-  // Update LED periods
-  leds[0].period = pwmToBlinkPeriod(pwmOutL); // left
-  leds[1].period = pwmToBlinkPeriod(pwmOutR); // right
-
-  // Blink each LED if necessary
-  for(int i=0; i<2; i++) {
-    if ( leds[i].period > 0 ) {
-      if ( millis() > leds[i].lastblink + leds[i].period/2 ) {
-        leds[i].lastblink = millis();
-        leds[i].state     = !leds[i].state;
-        digitalWrite(leds[i].pin, leds[i].state);
-      }
-    } else {
-      if ( !leds[i].state ) {
-        leds[i].state = true;
-        digitalWrite(leds[i].pin, HIGH);
-      }
+    if ( !_state ) {
+      _state = true;
+      digitalWrite(_pin, HIGH);
     }
   }
 }
