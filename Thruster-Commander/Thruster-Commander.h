@@ -72,4 +72,11 @@ THE SOFTWARE.
 #define DETECT_LOW  5                 // adc counts
 #define DETECT_HIGH 1018              // adc counts
 
+// LOW-PASS FILTER
+#define FILTER_DT   0.050f            // s
+#define FILTER_TAU  0.250f            // s
+
+// DETECT RATE
+#define DETECT_DT   0.250f            // s
+
 #endif
