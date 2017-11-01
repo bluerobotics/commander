@@ -68,10 +68,10 @@ float LPFilter::step(float input)
 
   // Run filter
   // Handle input
-  output += DT/TAU*_input;
+  output += FILTER_DT/FILTER_TAU*_input;
 
   // Handle output
-  output -= (DT/TAU - 1)*_output;
+  output -= (FILTER_DT/FILTER_TAU - 1)*_output;
 
   // Save latest output
   _output = output;

@@ -46,6 +46,7 @@ bool      inLIsConnected, inRIsConnected, inSPDIsConnected, inSTRIsConnected;
 int       pwmOutL, pwmOutR;
 Blinker   ledL, ledR;
 LPFilter  filterL, filterR;
+uint32_t  schedulePWM, scheduleDetect;
 
 
 void setup() {
@@ -73,71 +74,92 @@ void setup() {
 
   // Delay to allow ESCs to initialize
   delay(600);
+
+  // Schedule the next pwm, detect times
+  schedulePWM    = millis();
+  scheduleDetect = millis() + DETECT_DT*1000.0f;
 }
 
 void loop() {
-  int pwmL, pwmR, pwmSPD, pwmSTR;
-  int inputL, inputR, inputSPD, inputSTR, inputSWITCH;
+  // Update PWM signals
+  if (millis() > schedulePWM) {
+    int pwmL, pwmR, pwmSPD, pwmSTR;
+    int inputL, inputR, inputSPD, inputSTR, inputSWITCH;
 
-  // Read switch
-  inputSWITCH = digitalRead(SWITCH);
+    // Schedule the next PWM time
+    schedulePWM = millis() + FILTER_DT*1000;
 
-  // Read raw inputs
-  inputL   = analogRead(INPUT_L);
-  inputR   = analogRead(INPUT_R);
-  inputSPD = analogRead(INPUT_SPD);
-  inputSTR = analogRead(INPUT_STR);
+    // Read switch
+    inputSWITCH = digitalRead(SWITCH);
 
-  // Map standard inputs to 1000-2000 µs range
-  pwmL   = map(inputL   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
-  pwmR   = map(inputR   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
-  pwmSPD = map(inputSPD - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
+    // Read raw inputs
+    inputL   = analogRead(INPUT_L);
+    inputR   = analogRead(INPUT_R);
+    inputSPD = analogRead(INPUT_SPD);
+    inputSTR = analogRead(INPUT_STR);
 
-  // Map steering to +/- steering range
-  pwmSTR = map(inputSTR - POT_OFFSET,0,1023,-STEER_MAX,STEER_MAX);
+    // Map standard inputs to 1000-2000 µs range
+    pwmL   = map(inputL   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
+    pwmR   = map(inputR   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
+    pwmSPD = map(inputSPD - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
 
-  // Logic:
-  // If SWITCH is pulled low (enabled):
-  //   If both L and R are connected:
-  //     L controls pwmOutL, R controls pwmOutR
-  //   If both SPD and STR are connected:
-  //     Mix SPD and STR to control pwmOutL and pwmOutR
-  //   If only L is connected:
-  //     L controls both pwmOutL and pwmOutR
-  //   If only R is connected:
-  //     R controls both pwmOutL and pwmOutR
-  if ( inputSWITCH == LOW ) {
-    if ( inLIsConnected && inRIsConnected ) {
-      pwmOutL = pwmL;
-      pwmOutR = pwmR;
-    } else if ( inSPDIsConnected && inSTRIsConnected ) {
-      pwmOutL = constrain(pwmSPD+pwmSTR,PWM_MIN,PWM_MAX);
-      pwmOutR = constrain(pwmSPD-pwmSTR,PWM_MIN,PWM_MAX);
-    } else if ( inLIsConnected ) {
-      pwmOutL = pwmL;
-      pwmOutR = pwmL;
-    } else if ( inRIsConnected ) {
-      pwmOutL = pwmR;
-      pwmOutR = pwmR;
+    // Map steering to +/- steering range
+    pwmSTR = map(inputSTR - POT_OFFSET,0,1023,-STEER_MAX,STEER_MAX);
+
+    // Logic:
+    // If SWITCH is pulled low (enabled):
+    //   If both L and R are connected:
+    //     L controls pwmOutL, R controls pwmOutR
+    //   If both SPD and STR are connected:
+    //     Mix SPD and STR to control pwmOutL and pwmOutR
+    //   If only L is connected:
+    //     L controls both pwmOutL and pwmOutR
+    //   If only R is connected:
+    //     R controls both pwmOutL and pwmOutR
+    if ( inputSWITCH == LOW ) {
+      if ( inLIsConnected && inRIsConnected ) {
+        pwmOutL = pwmL;
+        pwmOutR = pwmR;
+      } else if ( inSPDIsConnected && inSTRIsConnected ) {
+        pwmOutL = constrain(pwmSPD+pwmSTR,PWM_MIN,PWM_MAX);
+        pwmOutR = constrain(pwmSPD-pwmSTR,PWM_MIN,PWM_MAX);
+      } else if ( inLIsConnected ) {
+        pwmOutL = pwmL;
+        pwmOutR = pwmL;
+      } else if ( inRIsConnected ) {
+        pwmOutL = pwmR;
+        pwmOutR = pwmR;
+      }
+    } else {
+      pwmOutL = PWM_NEUTRAL;
+      pwmOutR = PWM_NEUTRAL;
     }
-  } else {
-    pwmOutL = PWM_NEUTRAL;
-    pwmOutR = PWM_NEUTRAL;
+
+    // Run pwm outputs through filters
+    pwmOutL = filterL.step(pwmOutL);
+    pwmOutR = filterR.step(pwmOutR);
+
+    // Set pwm outputs
+    writePWM(PWM_L, pwmOutL);
+    writePWM(PWM_R, pwmOutR);
+
+    // Set LEDs
+    ledL.setPWM(pwmOutL);
+    ledR.setPWM(pwmOutR);
+
+    return;
   }
 
-  // Run pwm outputs through filters
-  pwmOutL = filterL.step(pwmOutL);
-  pwmOutR = filterR.step(pwmOutR);
+  // Update detect
+  if (millis() > scheduleDetect) {
+    // Schedule the next detect time
+    scheduleDetect = millis() + DETECT_DT*1000;
 
-  // Set pwm outputs
-  writePWM(PWM_L, pwmOutL);
-  writePWM(PWM_R, pwmOutR);
+    // Re-run detect()
+    detect();
 
-  // Set LEDs
-  ledL.setPWM(pwmOutL);
-  ledR.setPWM(pwmOutR);
-
-  delay(DT);   // set update rate
+    return;
+  }
 }
 
 
@@ -147,7 +169,7 @@ void detect() {
 
   // Drive both inputs high, wait, and log values
   digitalWrite(DETECT,HIGH);
-  delay(100);
+  delay(10);
   inL[1]   = analogRead(INPUT_L);
   inR[1]   = analogRead(INPUT_R);
   inSPD[1] = analogRead(INPUT_SPD);
@@ -155,7 +177,7 @@ void detect() {
 
   // Drive both inputs low, wait, and log values
   digitalWrite(DETECT,LOW);
-  delay(100);
+  delay(10);
   inL[0]   = analogRead(INPUT_L);
   inR[0]   = analogRead(INPUT_R);
   inSPD[0] = analogRead(INPUT_SPD);

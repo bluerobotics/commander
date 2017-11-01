@@ -37,11 +37,6 @@ THE SOFTWARE.
 #ifndef LPFILTER
 #define LPFILTER
 
-// LOW-PASS FILTER
-#define DT          0.050f            // s
-#define TAU         2.0f              // s
-
-
 class LPFilter
 {
   public:
