@@ -62,8 +62,6 @@ void setup() {
 
   // Initialize motor controllers
   initializePWMController();
-  writePWM(PWM_L, PWM_NEUTRAL);
-  writePWM(PWM_R, PWM_NEUTRAL);
 
   // Initialize LEDs
   initializeLEDs();
@@ -71,9 +69,6 @@ void setup() {
 
   // Detect what's connected
   detect();
-
-  // Delay to allow ESCs to initialize
-  delay(600);
 
   // Schedule the next pwm, detect times
   schedulePWM    = millis();
