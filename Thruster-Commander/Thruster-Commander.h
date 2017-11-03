@@ -78,7 +78,7 @@ THE SOFTWARE.
 
 // LOW-PASS FILTER
 #define FILTER_DT   0.050f            // s
-#define FILTER_TAU  0.250f            // s
+#define FILTER_TAU  0.500f            // s
 
 // DETECT RATE
 #define DETECT_DT   0.250f            // s
