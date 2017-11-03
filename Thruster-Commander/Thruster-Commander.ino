@@ -67,12 +67,9 @@ void setup() {
   initializeLEDs();
   writeBlinker(BLINK_S);
 
-  // Detect what's connected
-  detect();
-
   // Schedule the next pwm, detect times
-  schedulePWM    = millis();
-  scheduleDetect = millis() + DETECT_DT*1000.0f;
+  schedulePWM    = 0;
+  scheduleDetect = 0;
 }
 
 void loop() {
