@@ -45,8 +45,7 @@ THE SOFTWARE.
 LPFilter::LPFilter() {}
 
 // Constructor
-LPFilter::LPFilter(float dt, float tau, float prefill)
-{
+LPFilter::LPFilter(float dt, float tau, float prefill) {
   _dt   = dt;
   _tau  = tau;
 
@@ -63,8 +62,7 @@ LPFilter::~LPFilter() {} // Nothing to destruct
 ////////////////////
 
 // Move filter along one timestep, return filtered output
-float LPFilter::step(float input)
-{
+float LPFilter::step(float input) {
   // Update input
   _input = input;
 

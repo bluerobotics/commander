@@ -46,15 +46,15 @@ LPFilter  filter0, filter1;
 
 void setup() {
   // Set up pin modes
-  pinMode(INPUT_INT,INPUT);
-  pinMode(INPUT_EXT0,INPUT);
-  pinMode(INPUT_EXT1,INPUT);
-  pinMode(DETECT,OUTPUT);
-  pinMode(LED_INT,OUTPUT);
-  pinMode(LED_EXT0,OUTPUT);
-  pinMode(LED_EXT1,OUTPUT);
-  pinMode(PWM_0,OUTPUT);
-  pinMode(PWM_1,OUTPUT);
+  pinMode(INPUT_INT, INPUT);
+  pinMode(INPUT_EXT0, INPUT);
+  pinMode(INPUT_EXT1, INPUT);
+  pinMode(DETECT, OUTPUT);
+  pinMode(LED_INT, OUTPUT);
+  pinMode(LED_EXT0, OUTPUT);
+  pinMode(LED_EXT1, OUTPUT);
+  pinMode(PWM_0, OUTPUT);
+  pinMode(PWM_1, OUTPUT);
 
   // Initialize motor controllers
   initializePWMController();
@@ -72,13 +72,13 @@ void setup() {
   detect();
 
   // Delay to allow ESCs to initialize
-  digitalWrite(LED_INT,HIGH);
+  digitalWrite(LED_INT, HIGH);
   delay(200);
-  digitalWrite(LED_INT,LOW);
+  digitalWrite(LED_INT, LOW);
   delay(200);
-  digitalWrite(LED_INT,HIGH);
+  digitalWrite(LED_INT, HIGH);
   delay(200);
-  digitalWrite(LED_INT,LOW);
+  digitalWrite(LED_INT, LOW);
 }
 
 void loop() {
@@ -91,15 +91,15 @@ void loop() {
   input_ext1 = analogRead(INPUT_EXT1);
 
   // Map standard inputs to 1000-2000 µs range
-  pwmInt  = map(input_int,0,1023,1000,2000);
-  pwmExt0 = map(input_ext0 - EXT_OFFSET,0,1023,1000,2000);  // ext has offset
-  pwmExt1 = map(input_ext1 - EXT_OFFSET,0,1023,1000,2000);  // ext has offset
+  pwmInt  = map(input_int, 0, 1023, 1000, 2000);
+  pwmExt0 = map(input_ext0 - EXT_OFFSET, 0, 1023, 1000, 2000); // ext has offset
+  pwmExt1 = map(input_ext1 - EXT_OFFSET, 0, 1023, 1000, 2000); // ext has offset
 
   // Map mixed inputs for mixing mode
   bool isMixMode = input_int > 100;
-  int steerMax = map(input_int,100,1023,0,400);
-  pwmSteer = map(input_ext1,0,1023,-steerMax,steerMax);
-  pwmBase = map(input_ext0,0,1023,1000,2000);
+  int steerMax = map(input_int, 100, 1023, 0, 400);
+  pwmSteer = map(input_ext1, 0, 1023, -steerMax, steerMax);
+  pwmBase = map(input_ext0, 0, 1023, 1000, 2000);
 
   // Logic:
   // If both external inputs are connected:
@@ -107,19 +107,19 @@ void loop() {
   //   If the internal input is 100-1023, map to mixed steering mode proportional to internal input
   // If one external input is connected, map it to both outputs
   // If neither is connected, map the internal input to both outputs
-  if ( ext0IsConnected && ext1IsConnected ) {
-    if ( isMixMode ) {
-      pwmOut0 = constrain(pwmBase+pwmSteer,PWM_MIN,PWM_MAX);;
-      pwmOut1 = constrain(pwmBase-pwmSteer,PWM_MIN,PWM_MAX);;
+  if (ext0IsConnected && ext1IsConnected) {
+    if (isMixMode) {
+      pwmOut0 = constrain(pwmBase+pwmSteer, PWM_MIN, PWM_MAX);;
+      pwmOut1 = constrain(pwmBase-pwmSteer, PWM_MIN, PWM_MAX);;
     } else {
       pwmOut0 = pwmExt0;
       pwmOut1 = pwmExt1;
     }
   } else {
-    if ( ext0IsConnected ) {
+    if (ext0IsConnected) {
       pwmOut0 = pwmExt0;
       pwmOut1 = pwmExt0;
-    } else if ( ext1IsConnected ) {
+    } else if (ext1IsConnected) {
       pwmOut0 = pwmExt1;
       pwmOut1 = pwmExt1;
     } else {
@@ -131,7 +131,7 @@ void loop() {
   // Run pwm outputs through filters
   pwmOut0 = filter0.step(pwmOut0);
   pwmOut1 = filter1.step(pwmOut1);
-  
+
   // Set pwm outputs
   writePWM0(pwmOut0);
   writePWM1(pwmOut1);
@@ -147,29 +147,29 @@ void detect() {
   int a0, b0, a1, b1;
 
   // Drive both inputs low, wait, and log values
-  digitalWrite(DETECT,LOW);
+  digitalWrite(DETECT, LOW);
   delay(100);
   a0 = analogRead(INPUT_EXT0);
   a1 = analogRead(INPUT_EXT1);
 
   // Drive both inputs high, wait, and log values
-  digitalWrite(DETECT,HIGH);
+  digitalWrite(DETECT, HIGH);
   delay(100);
   b0 = analogRead(INPUT_EXT0);
   b1 = analogRead(INPUT_EXT1);
 
   // If inputs follow, potentiometer is disconnected, otherwise it's connected
-  if ( a0 < 5 && b0 > 1018 ) {
+  if (a0 < 5 && b0 > 1018) {
     ext0IsConnected = false;
   } else {
     ext0IsConnected = true;
   }
 
-  if ( a1 < 5 && b1 > 1018 ) {
+  if (a1 < 5 && b1 > 1018) {
     ext1IsConnected = false;
   } else {
     ext1IsConnected = true;
   }
 
-  digitalWrite(DETECT,LOW);
+  digitalWrite(DETECT, LOW);
 }

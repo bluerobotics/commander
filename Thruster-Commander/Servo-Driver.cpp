@@ -42,7 +42,7 @@ void writePWM0(int pulsewidth) {
   cli();
 
   // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+  pulsewidth = constrain(pulsewidth, PWM_MIN, PWM_MAX);
 
   // Set timer1 Output Compare Register A
   // Set shut-off counter value to get pulsewidth us pulse
@@ -57,7 +57,7 @@ void writePWM1(int pulsewidth) {
   cli();
 
   // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+  pulsewidth = constrain(pulsewidth, PWM_MIN, PWM_MAX);
 
   // Set timer1 Output Compare Register B
   // Set shut-off counter value to get pulsewidth us pulse
