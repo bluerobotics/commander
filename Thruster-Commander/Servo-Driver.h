@@ -35,8 +35,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#ifndef SERVO-DRIVER
-#define SERVO-DRIVER
+#ifndef SERVODRIVER
+#define SERVODRIVER
 
 #define OC1A_PIN  6
 #define OC1B_PIN  5
