@@ -8,7 +8,7 @@ Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -78,4 +78,3 @@ float LPFilter::step(float input)
 
   return output;
 }
-
