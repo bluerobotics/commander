@@ -40,11 +40,11 @@ THE SOFTWARE.
 int pwmToBlinkPeriod(int pulsewidth) {
   int period;
   // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+  pulsewidth = constrain(pulsewidth, PWM_MIN, PWM_MAX);
   // Set to solid at 1500 and flash faster in each direction
   int blinkspeed = abs(pulsewidth - PWM_NEUTRAL);
-  if ( blinkspeed > DEADZONE ) {
-    period = map(blinkspeed,DEADZONE,HALF_RANGE,2000,200);
+  if (blinkspeed > DEADZONE) {
+    period = map(blinkspeed, DEADZONE, HALF_RANGE, 2000, 200);
   } else {
     period = 0;
   }
@@ -56,7 +56,7 @@ void initializeLEDs(blinker_t leds[]) {
   leds[1].pin = LED_EXT1;
   leds[2].pin = LED_INT;
 
-  for ( int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++) {
     leds[i].lastblink = 0;
     leds[i].period    = 0;
     leds[i].state     = 0;
@@ -69,15 +69,15 @@ void setLEDs(blinker_t leds[], int pwmOut0, int pwmOut1) {
   leds[1].period = pwmToBlinkPeriod(pwmOut1); // ext1
 
   // Blink each LED if necessary
-  for(int i=0; i<3; i++) {
-    if ( leds[i].period > 0 ) {
-      if ( millis() > leds[i].lastblink + leds[i].period/2 ) {
+  for (int i=0; i<3; i++) {
+    if (leds[i].period > 0) {
+      if (millis() > leds[i].lastblink + leds[i].period/2) {
         leds[i].lastblink = millis();
         leds[i].state     = !leds[i].state;
         digitalWrite(leds[i].pin, leds[i].state);
       }
     } else {
-      if ( !leds[i].state ) {
+      if (!leds[i].state) {
         leds[i].state = true;
         digitalWrite(leds[i].pin, HIGH);
       }
