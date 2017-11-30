@@ -37,16 +37,15 @@ THE SOFTWARE.
 #ifndef LPFILTER
 #define LPFILTER
 
-class LPFilter
-{
-  public:
-    LPFilter();
-    ~LPFilter();
-    float step(float input);
+class LPFilter {
+public:
+  LPFilter();
+  ~LPFilter();
+  float step(float input);
 
-  private:
-    float _input;
-    float _output;
+private:
+  float _input;
+  float _output;
 };
 
 #endif

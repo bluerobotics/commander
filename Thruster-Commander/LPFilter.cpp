@@ -43,8 +43,7 @@ THE SOFTWARE.
 //////////////////
 
 // Default Constructor
-LPFilter::LPFilter()
-{
+LPFilter::LPFilter() {
   _input  = PWM_NEUTRAL;
   _output = PWM_NEUTRAL;
 }
@@ -58,8 +57,7 @@ LPFilter::~LPFilter() {} // Nothing to destruct
 ////////////////////
 
 // Move filter along one timestep, return filtered output
-float LPFilter::step(float input)
-{
+float LPFilter::step(float input) {
   // Update input
   _input = input;
 

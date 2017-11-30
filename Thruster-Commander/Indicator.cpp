@@ -39,9 +39,9 @@ THE SOFTWARE.
 #include "Thruster-Commander.h"
 
 namespace {
-  uint16_t  pattern;
-  uint8_t   patternindex;
-  bool      blinking;
+uint16_t  pattern;
+uint8_t   patternindex;
+bool      blinking;
 }
 
 ///////////////
@@ -68,7 +68,7 @@ void initializeLEDs() {
 // Set dimmer value
 void writeDimmer(int pin, int pwm) {
   // Check whether we were previously in Blinker mode
-  if ( blinking ) {
+  if (blinking) {
     // Stop blinking
     blinking = false;
     // Set up for dimming mode
@@ -79,14 +79,14 @@ void writeDimmer(int pin, int pwm) {
   cli();
 
   uint8_t period = constrain(map(abs(pwm - PWM_NEUTRAL), DEADZONE, HALF_RANGE,
-                             255, 0), 0, 255);   // 255 is off (inverting mode)
+                                 255, 0), 0, 255);   // 255 is off (inverting mode)
 
-  if ( pin == OC0A_PIN ) {
+  if (pin == OC0A_PIN) {
     // Set timer0 Output Compare Register A
     // Set shut-off counter value to get pulsewidth us pulse
     OCR0A = period;
   }
-  if ( pin == OC0B_PIN ) {
+  if (pin == OC0B_PIN) {
     // Set timer0 Output Compare Register B
     // Set shut-off counter value to get pulsewidth us pulse
     OCR0B = period;
@@ -99,7 +99,7 @@ void writeDimmer(int pin, int pwm) {
 // Set blink pattern
 void writeBlinker(uint16_t ptrn) {
   // Check whether we were previously in Blinker mode
-  if ( !blinking ) {
+  if (!blinking) {
     // Start blinking
     blinking = true;
     // Set up for dimming mode
@@ -109,7 +109,7 @@ void writeBlinker(uint16_t ptrn) {
   }
 
   // If pattern is different, reset index, save new pattern
-  if ( ptrn != pattern ) {
+  if (ptrn != pattern) {
     // Reset pattern index
     patternindex = 0;
     // Save new pattern
@@ -152,18 +152,18 @@ void setBlinkerBits() {
 ///////////////////////////////
 
 namespace {
-  uint16_t  isrcounter;
+uint16_t  isrcounter;
 }
 
 // Triggered every time OCR0A matches TIMER0 counter (488 Hz)
 SIGNAL(TIM0_COMPA_vect) {
   isrcounter++;
-  if ( isrcounter >= 2*(F_CPU/64/256)/16 ) {
+  if (isrcounter >= 2*(F_CPU/64/256)/16) {
     isrcounter = 0;
-    if ( blinking ) {
+    if (blinking) {
       digitalWrite(OC0A_PIN, bitRead(pattern, patternindex));
       digitalWrite(OC0B_PIN, bitRead(pattern, patternindex));
-      if (patternindex < 15 ) {
+      if (patternindex < 15) {
         patternindex++;
       } else {
         patternindex = 0;

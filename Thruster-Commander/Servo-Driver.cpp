@@ -44,13 +44,13 @@ void writePWM(int pin, int pulsewidth) {
 
   // Constrain pulsewidth to pwm range if > 0, otherwise set to neutral
   pulsewidth = (pulsewidth > 0) ? constrain(pulsewidth, PWM_MIN, PWM_MAX)
-                                : PWM_NEUTRAL;
+               : PWM_NEUTRAL;
 
-  if ( pin == OC1A_PIN ) {
+  if (pin == OC1A_PIN) {
     // Set timer1 Output Compare Register A
     // Set shut-off counter value to get pulsewidth us pulse
     OCR1A = (pulsewidth * CNT_PER_US) - 1;
-  } else if ( pin == OC1B_PIN ) {
+  } else if (pin == OC1B_PIN) {
     // Set timer1 Output Compare Register B
     // Set shut-off counter value to get pulsewidth us pulse
     OCR1B = (pulsewidth * CNT_PER_US) - 1;

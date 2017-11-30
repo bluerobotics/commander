@@ -110,17 +110,17 @@ void loop() {
     //     L controls both pwmOutL and pwmOutR
     //   If only R is connected:
     //     R controls both pwmOutL and pwmOutR
-    if ( inputSWITCH == LOW ) {
-      if ( inLIsConnected && inRIsConnected ) {
+    if (inputSWITCH == LOW) {
+      if (inLIsConnected && inRIsConnected) {
         pwmOutL = pwmL;
         pwmOutR = pwmR;
-      } else if ( inSPDIsConnected && inSTRIsConnected ) {
+      } else if (inSPDIsConnected && inSTRIsConnected) {
         pwmOutL = constrain(pwmSPD+pwmSTR,PWM_MIN,PWM_MAX);
         pwmOutR = constrain(pwmSPD-pwmSTR,PWM_MIN,PWM_MAX);
-      } else if ( inLIsConnected ) {
+      } else if (inLIsConnected) {
         pwmOutL = pwmL;
         pwmOutR = pwmL;
-      } else if ( inRIsConnected ) {
+      } else if (inRIsConnected) {
         pwmOutL = pwmR;
         pwmOutR = pwmR;
       } else {
@@ -189,8 +189,8 @@ void detect() {
   inSTR[0] = analogRead(INPUT_STR);
 
   // If inputs follow, potentiometer is disconnected, otherwise it's connected
-  inLIsConnected   = !( inL[0]   < DETECT_LOW && inL[1]   > DETECT_HIGH );
-  inRIsConnected   = !( inR[0]   < DETECT_LOW && inR[1]   > DETECT_HIGH );
-  inSPDIsConnected = !( inSPD[0] < DETECT_LOW && inSPD[1] > DETECT_HIGH );
-  inSTRIsConnected = !( inSTR[0] < DETECT_LOW && inSTR[1] > DETECT_HIGH );
+  inLIsConnected   = !(inL[0]   < DETECT_LOW && inL[1]   > DETECT_HIGH);
+  inRIsConnected   = !(inR[0]   < DETECT_LOW && inR[1]   > DETECT_HIGH);
+  inSPDIsConnected = !(inSPD[0] < DETECT_LOW && inSPD[1] > DETECT_HIGH);
+  inSTRIsConnected = !(inSTR[0] < DETECT_LOW && inSTR[1] > DETECT_HIGH);
 }
