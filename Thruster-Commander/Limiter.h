@@ -1,7 +1,7 @@
 /* Blue Robotics Thruster Commander Firmware
 -----------------------------------------------------
 
-Title: Blue Robotics Thruster Commander Firmware - Low-Pass Filter
+Title: Blue Robotics Thruster Commander Firmware - Acceleration Limiter
 
 Description: This code is the default firmware for the Blue Robotics
 Thruster Commander, which provides a simple interface to control a
@@ -34,18 +34,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
-#ifndef LPFILTER
-#define LPFILTER
+#ifndef LIMITER
+#define LIMITER
 
-class LPFilter {
+#include <Arduino.h>
+
+class Limiter {
 public:
-  LPFilter();
-  ~LPFilter();
+  Limiter();
+  Limiter(float maxaccel, float startvalue);
+  ~Limiter();
   float step(float input);
 
 private:
-  float _input;
-  float _output;
+  float    _lastoutput;
+  float    _maxaccel;
+  uint32_t _lastruntime;
 };
 
 #endif

@@ -39,11 +39,11 @@ THE SOFTWARE.
 
 #include "Servo-Driver.h"
 #include "Indicator.h"
-#include "LPFilter.h"
+#include "Limiter.h"
 
 // Global Variable Declaration
 bool      inLIsConnected, inRIsConnected, inSPDIsConnected, inSTRIsConnected;
-LPFilter  filterL, filterR;
+Limiter   limiterL, limiterR;
 uint32_t  schedulePWM, scheduleDetect;
 
 
@@ -67,6 +67,10 @@ void setup() {
   initializeLEDs();
   writeBlinker(BLINK_S);
 
+  // Initialize PWM acceleration limiters
+  limiterL = Limiter(MAX_ACCEL, PWM_NEUTRAL);
+  limiterR = Limiter(MAX_ACCEL, PWM_NEUTRAL);
+
   // Schedule the next pwm, detect times
   schedulePWM    = 0;
   scheduleDetect = 0;
@@ -81,7 +85,7 @@ void loop() {
     uint16_t errorPtrn = 0;
 
     // Schedule the next PWM time
-    schedulePWM = millis() + FILTER_DT*1000;
+    schedulePWM = millis() + UPDATE_DT*1000;
 
     // Read switch
     inputSWITCH = digitalRead(SWITCH);
@@ -134,9 +138,9 @@ void loop() {
       errorPtrn = BLINK_1L;
     }
 
-    // Run pwm outputs through filters
-    pwmOutL = filterL.step(pwmOutL);
-    pwmOutR = filterR.step(pwmOutR);
+    // Limit acceleration
+    pwmOutL = limiterL.step(pwmOutL);
+    pwmOutR = limiterR.step(pwmOutR);
 
     // Set pwm outputs
     writePWM(PWM_L, pwmOutL);

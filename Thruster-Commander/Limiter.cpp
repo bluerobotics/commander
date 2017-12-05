@@ -1,7 +1,7 @@
 /* Blue Robotics Thruster Commander Firmware
 -----------------------------------------------------
 
-Title: Blue Robotics Thruster Commander Firmware - Low-Pass Filter
+Title: Blue Robotics Thruster Commander Firmware - Acceleration Limiter
 
 Description: This code is the default firmware for the Blue Robotics
 Thruster Commander, which provides a simple interface to control a
@@ -35,21 +35,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#include "LPFilter.h"
-#include "Thruster-Commander.h"
+#include "Limiter.h"
+
+// DEFAULT VALUES
+#define DEFAULT_MAX_ACCEL 50      // us/s
 
 //////////////////
 // Constructors //
 //////////////////
 
 // Default Constructor
-LPFilter::LPFilter() {
-  _input  = PWM_NEUTRAL;
-  _output = PWM_NEUTRAL;
+Limiter::Limiter() {
+  this->_lastoutput   = 0;
+  this->_maxaccel     = DEFAULT_MAX_ACCEL;
+  this->_lastruntime  = millis();
+}
+
+// Useful Constructor
+Limiter::Limiter(float maxaccel, float startvalue) {
+  this->_lastoutput   = startvalue;
+  this->_maxaccel     = maxaccel;
+  this->_lastruntime  = millis();
 }
 
 // Destructor
-LPFilter::~LPFilter() {} // Nothing to destruct
+Limiter::~Limiter() {} // Nothing to destruct
 
 
 ////////////////////
@@ -57,22 +67,20 @@ LPFilter::~LPFilter() {} // Nothing to destruct
 ////////////////////
 
 // Move filter along one timestep, return filtered output
-float LPFilter::step(float input) {
-  // Update input
-  _input = input;
+float Limiter::step(float input) {
+  // Measure elapsed time
+  float dt  = (millis() - this->_lastruntime)/1000.0f;
+  this->_lastruntime = millis();
 
-  // Initialize output value
-  float output = 0;
+  // Calculate maximum/minimum allowable values this round
+  float max = this->_lastoutput + dt*(this->_maxaccel);
+  float min = this->_lastoutput - dt*(this->_maxaccel);
 
-  // Run filter
-  // Handle input
-  output += FILTER_DT/FILTER_TAU*_input;
-
-  // Handle output
-  output -= (FILTER_DT/FILTER_TAU - 1)*_output;
+  // Limit output value
+  float output = (input > max) ? max : ((input < min) ? min : input);
 
   // Save latest output
-  _output = output;
+  this->_lastoutput = output;
 
   return output;
 }
