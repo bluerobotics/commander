@@ -8,7 +8,7 @@ Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -37,139 +37,160 @@ THE SOFTWARE.
 
 #include "Thruster-Commander.h"
 
+#include "Servo-Driver.h"
+#include "Indicator.h"
+#include "LPFilter.h"
+
 // Global Variable Declaration
-bool      ext0IsConnected, ext1IsConnected;
-int       pwmOut0, pwmOut1;
-blinker_t leds[3];    // 0:ext0, 1:ext1, 2:int
-LPFilter  filter0, filter1;
+bool      inLIsConnected, inRIsConnected, inSPDIsConnected, inSTRIsConnected;
+LPFilter  filterL, filterR;
+uint32_t  schedulePWM, scheduleDetect;
 
 
 void setup() {
   // Set up pin modes
-  pinMode(INPUT_INT,INPUT);
-  pinMode(INPUT_EXT0,INPUT);
-  pinMode(INPUT_EXT1,INPUT);
+  pinMode(INPUT_L,INPUT);
+  pinMode(INPUT_R,INPUT);
+  pinMode(INPUT_SPD,INPUT);
+  pinMode(INPUT_STR,INPUT);
+  pinMode(SWITCH,INPUT);
   pinMode(DETECT,OUTPUT);
-  pinMode(LED_INT,OUTPUT);
-  pinMode(LED_EXT0,OUTPUT);
-  pinMode(LED_EXT1,OUTPUT);
-  pinMode(PWM_0,OUTPUT);
-  pinMode(PWM_1,OUTPUT);
+  pinMode(PWM_L,OUTPUT);
+  pinMode(PWM_R,OUTPUT);
+  pinMode(LED_L,OUTPUT);
+  pinMode(LED_R,OUTPUT);
 
   // Initialize motor controllers
   initializePWMController();
-  writePWM0(1500);
-  writePWM1(1500);
 
-  // Initialize low-pass filters
-  filter0 = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
-  filter1 = LPFilter(1.0f/UPDATE_FREQ, 1.0f/CUTOFF_FREQ, PWM_NEUTRAL);
+  // Initialize LEDs
+  initializeLEDs();
+  writeBlinker(BLINK_S);
 
-  // Initialize all 3 LEDs
-  initializeLEDs(leds);
-
-  // Detect what's connected
-  detect();
-
-  // Delay to allow ESCs to initialize
-  digitalWrite(LED_INT,HIGH);
-  delay(200);
-  digitalWrite(LED_INT,LOW);
-  delay(200);
-  digitalWrite(LED_INT,HIGH);
-  delay(200);
-  digitalWrite(LED_INT,LOW);
+  // Schedule the next pwm, detect times
+  schedulePWM    = 0;
+  scheduleDetect = 0;
 }
 
 void loop() {
-  int pwmInt, pwmExt0, pwmExt1, pwmBase, pwmSteer;
-  int input_int, input_ext0, input_ext1;
+  // Update PWM signals
+  if (millis() > schedulePWM) {
+    int pwmL, pwmR, pwmSPD, pwmSTR;
+    int pwmOutL, pwmOutR;
+    int inputL, inputR, inputSPD, inputSTR, inputSWITCH;
+    uint16_t errorPtrn = 0;
 
-  // Read raw inputs
-  input_int = analogRead(INPUT_INT);
-  input_ext0 = analogRead(INPUT_EXT0);
-  input_ext1 = analogRead(INPUT_EXT1);
+    // Schedule the next PWM time
+    schedulePWM = millis() + FILTER_DT*1000;
 
-  // Map standard inputs to 1000-2000 µs range
-  pwmInt  = map(input_int,0,1023,1000,2000);
-  pwmExt0 = map(input_ext0 - EXT_OFFSET,0,1023,1000,2000);  // ext has offset
-  pwmExt1 = map(input_ext1 - EXT_OFFSET,0,1023,1000,2000);  // ext has offset
+    // Read switch
+    inputSWITCH = digitalRead(SWITCH);
 
-  // Map mixed inputs for mixing mode
-  bool isMixMode = input_int > 100;
-  int steerMax = map(input_int,100,1023,0,400);
-  pwmSteer = map(input_ext1,0,1023,-steerMax,steerMax);
-  pwmBase = map(input_ext0,0,1023,1000,2000);
+    // Read raw inputs
+    inputL   = analogRead(INPUT_L);
+    inputR   = analogRead(INPUT_R);
+    inputSPD = analogRead(INPUT_SPD);
+    inputSTR = analogRead(INPUT_STR);
 
-  // Logic:
-  // If both external inputs are connected:
-  //   If the internal input is low, map outputs independently
-  //   If the internal input is 100-1023, map to mixed steering mode proportional to internal input
-  // If one external input is connected, map it to both outputs
-  // If neither is connected, map the internal input to both outputs
-  if ( ext0IsConnected && ext1IsConnected ) {
-    if ( isMixMode ) {
-      pwmOut0 = constrain(pwmBase+pwmSteer,PWM_MIN,PWM_MAX);;
-      pwmOut1 = constrain(pwmBase-pwmSteer,PWM_MIN,PWM_MAX);;
+    // Map standard inputs to 1000-2000 µs range
+    pwmL   = map(inputL   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
+    pwmR   = map(inputR   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
+    pwmSPD = map(inputSPD - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
+
+    // Map steering to +/- steering range
+    pwmSTR = map(inputSTR - POT_OFFSET,0,1023,-STEER_MAX,STEER_MAX);
+
+    // Logic:
+    // If SWITCH is pulled low (enabled):
+    //   If both L and R are connected:
+    //     L controls pwmOutL, R controls pwmOutR
+    //   If both SPD and STR are connected:
+    //     Mix SPD and STR to control pwmOutL and pwmOutR
+    //   If only L is connected:
+    //     L controls both pwmOutL and pwmOutR
+    //   If only R is connected:
+    //     R controls both pwmOutL and pwmOutR
+    if (inputSWITCH == LOW) {
+      if (inLIsConnected && inRIsConnected) {
+        pwmOutL = pwmL;
+        pwmOutR = pwmR;
+      } else if (inSPDIsConnected && inSTRIsConnected) {
+        pwmOutL = constrain(pwmSPD+pwmSTR,PWM_MIN,PWM_MAX);
+        pwmOutR = constrain(pwmSPD-pwmSTR,PWM_MIN,PWM_MAX);
+      } else if (inLIsConnected) {
+        pwmOutL = pwmL;
+        pwmOutR = pwmL;
+      } else if (inRIsConnected) {
+        pwmOutL = pwmR;
+        pwmOutR = pwmR;
+      } else {
+        pwmOutL   = PWM_NEUTRAL;
+        pwmOutR   = PWM_NEUTRAL;
+        errorPtrn = BLINK_2S;
+      }
     } else {
-      pwmOut0 = pwmExt0;
-      pwmOut1 = pwmExt1;
+      pwmOutL   = PWM_NEUTRAL;
+      pwmOutR   = PWM_NEUTRAL;
+      errorPtrn = BLINK_1L;
     }
-  } else {
-    if ( ext0IsConnected ) {
-      pwmOut0 = pwmExt0;
-      pwmOut1 = pwmExt0;
-    } else if ( ext1IsConnected ) {
-      pwmOut0 = pwmExt1;
-      pwmOut1 = pwmExt1;
+
+    // Run pwm outputs through filters
+    pwmOutL = filterL.step(pwmOutL);
+    pwmOutR = filterR.step(pwmOutR);
+
+    // Set pwm outputs
+    writePWM(PWM_L, pwmOutL);
+    writePWM(PWM_R, pwmOutR);
+
+    // Set LEDs
+    if (errorPtrn == 0) {
+      // No errors, display dimmer value
+      writeDimmer(LED_L, pwmOutL);
+      writeDimmer(LED_R, pwmOutR);
     } else {
-      pwmOut0 = pwmInt;
-      pwmOut1 = pwmInt;
+      // display error pattern
+      writeBlinker(errorPtrn);
     }
+
+    return;
   }
 
-  // Run pwm outputs through filters
-  pwmOut0 = filter0.step(pwmOut0);
-  pwmOut1 = filter1.step(pwmOut1);
-  
-  // Set pwm outputs
-  writePWM0(pwmOut0);
-  writePWM1(pwmOut1);
+  // Update detect
+  if (millis() > scheduleDetect) {
+    // Schedule the next detect time
+    scheduleDetect = millis() + DETECT_DT*1000;
 
-  setLEDs(leds, pwmOut0, pwmOut1);
+    // Re-run detect()
+    detect();
 
-  delay(1.0f/UPDATE_FREQ);   // set update rate
+    return;
+  }
 }
 
 
 void detect() {
-  // Detect what's connected by driving lines through 1M resistors
-  int a0, b0, a1, b1;
-
-  // Drive both inputs low, wait, and log values
-  digitalWrite(DETECT,LOW);
-  delay(100);
-  a0 = analogRead(INPUT_EXT0);
-  a1 = analogRead(INPUT_EXT1);
+  // Detect what's connected by driving lines through 100k resistors
+  int inL[2], inR[2], inSPD[2], inSTR[2];   // 0:low, 1:high
 
   // Drive both inputs high, wait, and log values
   digitalWrite(DETECT,HIGH);
-  delay(100);
-  b0 = analogRead(INPUT_EXT0);
-  b1 = analogRead(INPUT_EXT1);
+  delay(10);
+  inL[1]   = analogRead(INPUT_L);
+  inR[1]   = analogRead(INPUT_R);
+  inSPD[1] = analogRead(INPUT_SPD);
+  inSTR[1] = analogRead(INPUT_STR);
+
+  // Drive both inputs low, wait, and log values
+  digitalWrite(DETECT,LOW);
+  delay(10);
+  inL[0]   = analogRead(INPUT_L);
+  inR[0]   = analogRead(INPUT_R);
+  inSPD[0] = analogRead(INPUT_SPD);
+  inSTR[0] = analogRead(INPUT_STR);
 
   // If inputs follow, potentiometer is disconnected, otherwise it's connected
-  if ( a0 < 5 && b0 > 1018 ) {
-    ext0IsConnected = false;
-  } else {
-    ext0IsConnected = true;
-  }
-
-  if ( a1 < 5 && b1 > 1018 ) {
-    ext1IsConnected = false;
-  } else {
-    ext1IsConnected = true;
-  }
-
-  digitalWrite(DETECT,LOW);
+  inLIsConnected   = !(inL[0]   < DETECT_LOW && inL[1]   > DETECT_HIGH);
+  inRIsConnected   = !(inR[0]   < DETECT_LOW && inR[1]   > DETECT_HIGH);
+  inSPDIsConnected = !(inSPD[0] < DETECT_LOW && inSPD[1] > DETECT_HIGH);
+  inSTRIsConnected = !(inSTR[0] < DETECT_LOW && inSTR[1] > DETECT_HIGH);
 }

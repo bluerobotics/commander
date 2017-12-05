@@ -8,7 +8,7 @@ Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -36,32 +36,25 @@ THE SOFTWARE.
 -------------------------------*/
 
 #include "Servo-Driver.h"
+#include "Thruster-Commander.h"
 
-void writePWM0(int pulsewidth) {
+void writePWM(int pin, int pulsewidth) {
   // Stop interrupts while changing pwm settings
   cli();
 
-  // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
+  // Constrain pulsewidth to pwm range if > 0, otherwise set to neutral
+  pulsewidth = (pulsewidth > 0) ? constrain(pulsewidth, PWM_MIN, PWM_MAX)
+               : PWM_NEUTRAL;
 
-  // Set timer1 Output Compare Register A
-  // Set shut-off counter value to get pulsewidth us pulse
-  OCR1A = (pulsewidth * CNT_PER_US) - 1;
-
-  // Done setting timers -> allow interrupts again
-  sei();
-}
-
-void writePWM1(int pulsewidth) {
-  // Stop interrupts while changing pwm settings
-  cli();
-
-  // Constrain pulsewidth
-  pulsewidth = constrain(pulsewidth,PWM_MIN,PWM_MAX);
-
-  // Set timer1 Output Compare Register B
-  // Set shut-off counter value to get pulsewidth us pulse
-  OCR1B = (pulsewidth * CNT_PER_US) - 1;
+  if (pin == OC1A_PIN) {
+    // Set timer1 Output Compare Register A
+    // Set shut-off counter value to get pulsewidth us pulse
+    OCR1A = (pulsewidth * CNT_PER_US) - 1;
+  } else if (pin == OC1B_PIN) {
+    // Set timer1 Output Compare Register B
+    // Set shut-off counter value to get pulsewidth us pulse
+    OCR1B = (pulsewidth * CNT_PER_US) - 1;
+  }
 
   // Done setting timers -> allow interrupts again
   sei();

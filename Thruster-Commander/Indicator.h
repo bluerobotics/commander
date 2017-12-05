@@ -1,14 +1,14 @@
 /* Blue Robotics Thruster Commander Firmware
 -----------------------------------------------------
 
-Title: Blue Robotics Thruster Commander Firmware - Blinker
+Title: Blue Robotics Thruster Commander Firmware - Indicator
 
 Description: This code is the default firmware for the Blue Robotics
 Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -35,22 +35,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#ifndef BLINKER
-#define BLINKER
+#ifndef INDICATOR
+#define INDICATOR
 
-#include "Thruster-Commander.h"
+#include <Arduino.h>
 
-// Struct Type Definition
-struct blinker_t {
-  unsigned long lastblink;  // timestamp (ms)
-  unsigned int  period;     // ms
-  int           pin;
-  bool          state;
-};
+#define OC0A_PIN  8
+#define OC0B_PIN  7
 
-// Function Declaration
-int  pwmToBlinkPeriod(int pulsewidth);
-void initializeLEDs(blinker_t leds[]);
-void setLEDs(blinker_t leds[], int pwmOut0, int pwmOut1);
+#define BLINK_1S  0b00000001  // 1 short blink
+#define BLINK_2S  0b00000101  // 2 short blinks
+#define BLINK_3S  0b00010101  // 3 short blinks
+#define BLINK_4S  0b01010101  // 4 short blinks
+#define BLINK_1L  0b00000111  // 1 long blink
+#define BLINK_2L  0b01110111  // 2 long blinks
+
+#define BLINK_S   0b0101010101010101  // constant short blinking
+#define BLINK_L   0b0111011101110111  // constant long blinking
+
+void initializeLEDs();
+void writeDimmer(int pin, int pulsewidth);
+void writeBlinker(uint16_t ptrn);
+void setDimmerBits();
+void setBlinkerBits();
 
 #endif

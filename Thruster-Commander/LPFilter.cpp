@@ -8,7 +8,7 @@ Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -36,22 +36,16 @@ THE SOFTWARE.
 -------------------------------*/
 
 #include "LPFilter.h"
+#include "Thruster-Commander.h"
 
 //////////////////
 // Constructors //
 //////////////////
 
 // Default Constructor
-LPFilter::LPFilter() {}
-
-// Constructor
-LPFilter::LPFilter(float dt, float tau, float prefill)
-{
-  _dt   = dt;
-  _tau  = tau;
-
-  _input  = prefill;
-  _output = prefill;
+LPFilter::LPFilter() {
+  _input  = PWM_NEUTRAL;
+  _output = PWM_NEUTRAL;
 }
 
 // Destructor
@@ -63,8 +57,7 @@ LPFilter::~LPFilter() {} // Nothing to destruct
 ////////////////////
 
 // Move filter along one timestep, return filtered output
-float LPFilter::step(float input)
-{
+float LPFilter::step(float input) {
   // Update input
   _input = input;
 
@@ -73,14 +66,13 @@ float LPFilter::step(float input)
 
   // Run filter
   // Handle input
-  output += _dt/_tau*_input;
+  output += FILTER_DT/FILTER_TAU*_input;
 
   // Handle output
-  output -= (_dt/_tau - 1)*_output;
+  output -= (FILTER_DT/FILTER_TAU - 1)*_output;
 
   // Save latest output
   _output = output;
 
   return output;
 }
-

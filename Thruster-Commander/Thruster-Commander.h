@@ -8,7 +8,7 @@ Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -35,24 +35,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#ifndef THRUSTER-COMMANDER
-#define THRUSTER-COMMANDER
+#ifndef THRUSTERCOMMANDER
+#define THRUSTERCOMMANDER
 
 #include <Arduino.h>
 
-#include "Servo-Driver.h"
-#include "Blinker.h"
-#include "LPFilter.h"
-
 // HARDWARE PIN DEFINITIONS
-#define INPUT_INT   A1
-#define INPUT_EXT0  A2
-#define INPUT_EXT1  A3
-#define PWM_0       6
-#define PWM_1       5
-#define LED_INT     4
-#define LED_EXT0    8
-#define LED_EXT1    7
+#define INPUT_L     A3  // Left In
+#define INPUT_R     A2  // Right In
+#define INPUT_SPD   A3  // Speed
+#define INPUT_STR   A1  // Steering
+#define SWITCH      4
+#define PWM_L       5
+#define PWM_R       6
+#define LED_L       8
+#define LED_R       7
 #define DETECT      0
 
 // PWM GENERATION DEFINITIONS
@@ -66,13 +63,24 @@ THE SOFTWARE.
 #define PWM_MAX     2000              // us
 #define PWM_MIN     1000              // us
 #define PWM_NEUTRAL 1500              // us
+#define STEER_MAX   400               // us
 #define HALF_RANGE  500               // us
 #define DEADZONE    25                // us
-#define EXT_OFFSET  -12               // adc counts
+#define POT_OFFSET  -12               // adc counts
+
+// DETECT PARAMETERS
+#define DETECT_LOW  5                 // adc counts
+#define DETECT_HIGH 1018              // adc counts
+
+// BLINKER CHARACTERISTICS
+#define PERIOD_MIN  200               // ms
+#define PERIOD_MAX  2000              // ms
 
 // LOW-PASS FILTER
-#define UPDATE_FREQ 20.0f             // Hz
-#define CUTOFF_FREQ 0.5f              // Hz
+#define FILTER_DT   0.050f            // s
+#define FILTER_TAU  0.500f            // s
 
+// DETECT RATE
+#define DETECT_DT   0.250f            // s
 
 #endif

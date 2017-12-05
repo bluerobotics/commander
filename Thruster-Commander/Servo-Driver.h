@@ -8,7 +8,7 @@ Thruster Commander, which provides a simple interface to control a
 bidirectional speed controller with PWM signals. It can be used to test
 motors or to control simple vehicles like a kayak.
 
-The code is designed for the ATtiny44 microcontroller and can be compiled and
+The code is designed for the ATtiny84 microcontroller and can be compiled and
 uploaded via the Arduino 1.0+ software.
 
 -------------------------------
@@ -35,15 +35,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -------------------------------*/
 
-#ifndef SERVO-DRIVER
-#define SERVO-DRIVER
+#ifndef SERVODRIVER
+#define SERVODRIVER
 
-#include "Thruster-Commander.h"
+#define OC1A_PIN  6
+#define OC1B_PIN  5
 
 // Function Declarations
-void writePWM0(int pulsewidth);
-void writePWM1(int pulsewidth);
+void writePWM(int pin, int pulsewidth);
 void initializePWMController();
-
 
 #endif
