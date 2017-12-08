@@ -76,9 +76,11 @@ THE SOFTWARE.
 #define PERIOD_MIN  200               // ms
 #define PERIOD_MAX  2000              // ms
 
-// LOW-PASS FILTER
-#define FILTER_DT   0.050f            // s
-#define FILTER_TAU  0.500f            // s
+// ACCELERATION CONTROL
+#define MAX_ACCEL   (HALF_RANGE/0.8f) // us/s
+
+// PWM UPDATE RATE
+#define UPDATE_DT   0.050f            // s
 
 // DETECT RATE
 #define DETECT_DT   0.250f            // s
