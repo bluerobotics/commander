@@ -2485,10 +2485,10 @@ LETTER landscape</description>
 </class>
 </classes>
 <parts>
-<part name="PWM0A" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
-<part name="PWM0B" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
-<part name="PWM1A" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
-<part name="PWM1B" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
+<part name="PWM_L_A" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
+<part name="PWM_L_B" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
+<part name="PWM_R_A" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
+<part name="PWM_R_B" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
 <part name="THR0" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
 <part name="THR1" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
 <part name="FRAME1" library="BlueRobotics-Main" deviceset="FRAME-BLUEROBOTICS" device=""/>
@@ -2504,10 +2504,10 @@ LETTER landscape</description>
 <plain>
 </plain>
 <instances>
-<instance part="PWM0A" gate="G$1" x="114.3" y="55.88"/>
-<instance part="PWM0B" gate="G$1" x="147.32" y="55.88"/>
-<instance part="PWM1A" gate="G$1" x="182.88" y="55.88"/>
-<instance part="PWM1B" gate="G$1" x="215.9" y="55.88"/>
+<instance part="PWM_L_A" gate="G$1" x="114.3" y="55.88"/>
+<instance part="PWM_L_B" gate="G$1" x="147.32" y="55.88"/>
+<instance part="PWM_R_A" gate="G$1" x="182.88" y="55.88"/>
+<instance part="PWM_R_B" gate="G$1" x="215.9" y="55.88"/>
 <instance part="THR0" gate="G$1" x="170.18" y="144.78"/>
 <instance part="THR1" gate="G$1" x="170.18" y="127"/>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
@@ -2541,9 +2541,14 @@ LETTER landscape</description>
 <pinref part="J1" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<pinref part="PWM0A" gate="G$1" pin="2"/>
+<pinref part="PWM_L_A" gate="G$1" pin="2"/>
 <wire x1="121.92" y1="55.88" x2="129.54" y2="55.88" width="0.1524" layer="91"/>
 <label x="129.54" y="55.88" size="1.778" layer="95" rot="MR0"/>
+</segment>
+<segment>
+<pinref part="PWM_L_B" gate="G$1" pin="2"/>
+<wire x1="154.94" y1="55.88" x2="162.56" y2="55.88" width="0.1524" layer="91"/>
+<label x="162.56" y="55.88" size="1.778" layer="95" rot="MR0"/>
 </segment>
 </net>
 <net name="RESET" class="0">
@@ -2568,40 +2573,6 @@ LETTER landscape</description>
 <label x="193.04" y="144.78" size="1.778" layer="95" rot="MR0"/>
 </segment>
 </net>
-<net name="PWM0" class="0">
-<segment>
-<pinref part="PWM0A" gate="G$1" pin="1"/>
-<wire x1="121.92" y1="53.34" x2="129.54" y2="53.34" width="0.1524" layer="91"/>
-<label x="124.46" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PWM0B" gate="G$1" pin="1"/>
-<wire x1="154.94" y1="53.34" x2="160.02" y2="53.34" width="0.1524" layer="91"/>
-<label x="157.48" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
-<wire x1="55.88" y1="71.12" x2="68.58" y2="71.12" width="0.1524" layer="91"/>
-<label x="63.5" y="71.12" size="1.778" layer="95"/>
-<pinref part="J1" gate="G$1" pin="4"/>
-</segment>
-</net>
-<net name="PWM1" class="0">
-<segment>
-<pinref part="PWM1A" gate="G$1" pin="1"/>
-<wire x1="190.5" y1="53.34" x2="195.58" y2="53.34" width="0.1524" layer="91"/>
-<label x="193.04" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PWM1B" gate="G$1" pin="1"/>
-<wire x1="223.52" y1="53.34" x2="228.6" y2="53.34" width="0.1524" layer="91"/>
-<label x="226.06" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
-<wire x1="38.1" y1="73.66" x2="25.4" y2="73.66" width="0.1524" layer="91"/>
-<label x="25.4" y="73.66" size="1.778" layer="95"/>
-<pinref part="J1" gate="G$1" pin="1"/>
-</segment>
-</net>
 <net name="SWITCH" class="0">
 <segment>
 <wire x1="38.1" y1="71.12" x2="25.4" y2="71.12" width="0.1524" layer="91"/>
@@ -2619,6 +2590,40 @@ LETTER landscape</description>
 <wire x1="177.8" y1="91.44" x2="193.04" y2="91.44" width="0.1524" layer="91"/>
 <pinref part="STEER" gate="G$1" pin="2"/>
 <label x="193.04" y="91.44" size="1.778" layer="95" rot="MR0"/>
+</segment>
+</net>
+<net name="PWM_L" class="0">
+<segment>
+<pinref part="PWM_L_A" gate="G$1" pin="1"/>
+<wire x1="121.92" y1="53.34" x2="129.54" y2="53.34" width="0.1524" layer="91"/>
+<label x="124.46" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PWM_L_B" gate="G$1" pin="1"/>
+<wire x1="154.94" y1="53.34" x2="162.56" y2="53.34" width="0.1524" layer="91"/>
+<label x="157.48" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<wire x1="38.1" y1="73.66" x2="25.4" y2="73.66" width="0.1524" layer="91"/>
+<label x="25.4" y="73.66" size="1.778" layer="95"/>
+<pinref part="J1" gate="G$1" pin="1"/>
+</segment>
+</net>
+<net name="PWM_R" class="0">
+<segment>
+<pinref part="PWM_R_A" gate="G$1" pin="1"/>
+<wire x1="190.5" y1="53.34" x2="195.58" y2="53.34" width="0.1524" layer="91"/>
+<label x="193.04" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PWM_R_B" gate="G$1" pin="1"/>
+<wire x1="223.52" y1="53.34" x2="228.6" y2="53.34" width="0.1524" layer="91"/>
+<label x="226.06" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<wire x1="55.88" y1="71.12" x2="68.58" y2="71.12" width="0.1524" layer="91"/>
+<label x="63.5" y="71.12" size="1.778" layer="95"/>
+<pinref part="J1" gate="G$1" pin="4"/>
 </segment>
 </net>
 </nets>
