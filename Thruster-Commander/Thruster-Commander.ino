@@ -136,8 +136,8 @@ void loop() {
     }
 
     // Limit acceleration
-    pwmOutL = limiterL.step(pwmOutL);
-    pwmOutR = limiterR.step(pwmOutR);
+//     pwmOutL = limiterL.step(pwmOutL);
+//     pwmOutR = limiterR.step(pwmOutR);
 
     // Set pwm outputs
     writePWM(PWM_L, pwmOutL);
