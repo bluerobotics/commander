@@ -71,6 +71,9 @@ void setup() {
   // Initialize PWM acceleration limiters
   limiterL = Limiter(MAX_ACCEL, PWM_NEUTRAL);
   limiterR = Limiter(MAX_ACCEL, PWM_NEUTRAL);
+
+  // Set DETECT pin to HIGH to act as a pull-up resistor
+  digitalWrite(DETECT,HIGH);
 }
 
 void loop() {
@@ -88,46 +91,29 @@ void loop() {
     inputSWITCH = digitalRead(SWITCH);
 
     // Read raw inputs
-    inputL   = analogRead(INPUT_L);
-    inputR   = analogRead(INPUT_R);
-    inputSPD = analogRead(INPUT_SPD);
-    inputSTR = analogRead(INPUT_STR);
-
-    // Map standard inputs to 1000-2000 µs range
-    pwmL   = map(inputL   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
-    pwmR   = map(inputR   - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
-    pwmSPD = map(inputSPD - POT_OFFSET,0,1023,PWM_MIN,PWM_MAX);
-
-    // Map steering to +/- steering range
-    pwmSTR = map(inputSTR - POT_OFFSET,0,1023,-STEER_MAX,STEER_MAX);
+    inputL   = digitalRead(INPUT_L);
+    inputR   = digitalRead(INPUT_R);
 
     // Logic:
     // If SWITCH is pulled low (enabled):
-    //   If both L and R are connected:
-    //     L controls pwmOutL, R controls pwmOutR
-    //   If both SPD and STR are connected:
-    //     Mix SPD and STR to control pwmOutL and pwmOutR
-    //   If only L is connected:
-    //     L controls both pwmOutL and pwmOutR
-    //   If only R is connected:
-    //     R controls both pwmOutL and pwmOutR
+    //   If L is pressed:
+    //     Output PWM_MAX
+    //   If R is pressed (and L isn't):
+    //     Output PWM_MIN
+    //   Else:
+    //     Output PWM_NEUTRAL
+    // Else:
+    //   Output PWM_NEUTRAL, blink "disabled"
     if (inputSWITCH == LOW) {
-      if (inLIsConnected && inRIsConnected) {
-        pwmOutL = pwmL;
-        pwmOutR = pwmR;
-      } else if (inSPDIsConnected && inSTRIsConnected) {
-        pwmOutL = constrain(pwmSPD+pwmSTR,PWM_MIN,PWM_MAX);
-        pwmOutR = constrain(pwmSPD-pwmSTR,PWM_MIN,PWM_MAX);
-      } else if (inLIsConnected) {
-        pwmOutL = pwmL;
-        pwmOutR = pwmL;
-      } else if (inRIsConnected) {
-        pwmOutL = pwmR;
-        pwmOutR = pwmR;
+      if (inputL == LOW) {
+        pwmOutL = PWM_MAX;
+        pwmOutR = PWM_MAX;
+      } else if (inputR == LOW) {
+        pwmOutL = PWM_MIN;
+        pwmOutR = PWM_MIN;
       } else {
         pwmOutL   = PWM_NEUTRAL;
         pwmOutR   = PWM_NEUTRAL;
-        errorPtrn = BLINK_2S;
       }
     } else {
       pwmOutL   = PWM_NEUTRAL;
@@ -162,7 +148,7 @@ void loop() {
     lastdetectruntime = millis();
 
     // Re-run detect()
-    detect();
+//     detect();
 
     return;
   }
