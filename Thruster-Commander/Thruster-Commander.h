@@ -69,8 +69,8 @@ THE SOFTWARE.
 #define POT_OFFSET  -12               // adc counts
 
 // DETECT PARAMETERS
-#define DETECT_LOW  5                 // adc counts
-#define DETECT_HIGH 1018              // adc counts
+#define DETECT_LOW  20                // adc counts
+#define DETECT_HIGH 1003              // adc counts
 
 // BLINKER CHARACTERISTICS
 #define PERIOD_MIN  200               // ms
