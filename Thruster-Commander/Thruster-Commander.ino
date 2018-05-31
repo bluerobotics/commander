@@ -44,7 +44,8 @@ THE SOFTWARE.
 // Global Variable Declaration
 bool      inLIsConnected, inRIsConnected, inSPDIsConnected, inSTRIsConnected;
 Limiter   limiterL, limiterR;
-uint32_t  schedulePWM, scheduleDetect;
+uint32_t  lastpwmupdateruntime  = 0;
+uint32_t  lastdetectruntime     = 0;
 
 
 void setup() {
@@ -70,22 +71,18 @@ void setup() {
   // Initialize PWM acceleration limiters
   limiterL = Limiter(MAX_ACCEL, PWM_NEUTRAL);
   limiterR = Limiter(MAX_ACCEL, PWM_NEUTRAL);
-
-  // Schedule the next pwm, detect times
-  schedulePWM    = 0;
-  scheduleDetect = 0;
 }
 
 void loop() {
   // Update PWM signals
-  if (millis() > schedulePWM) {
+  if ((millis() - lastpwmupdateruntime) > UPDATE_DT*1000) {
     int pwmL, pwmR, pwmSPD, pwmSTR;
     int pwmOutL, pwmOutR;
     int inputL, inputR, inputSPD, inputSTR, inputSWITCH;
     uint16_t errorPtrn = 0;
 
-    // Schedule the next PWM time
-    schedulePWM = millis() + UPDATE_DT*1000;
+    // Record PWM update runtime
+    lastpwmupdateruntime = millis();
 
     // Read switch
     inputSWITCH = digitalRead(SWITCH);
@@ -160,9 +157,9 @@ void loop() {
   }
 
   // Update detect
-  if (millis() > scheduleDetect) {
-    // Schedule the next detect time
-    scheduleDetect = millis() + DETECT_DT*1000;
+  if ((millis() - lastdetectruntime) > DETECT_DT*1000) {
+    // Record detect runtime
+    lastdetectruntime = millis();
 
     // Re-run detect()
     detect();
