@@ -1,6 +1,8 @@
 # Commander
 
-Blue Robotics Thruster Commander hardware and software.
+Blue Robotics Thruster Commander hardware and software: Thruster Test Jig Version.
+
+Acceleration is limited more in this version than is usual.  Changing speed from stopped to full speed takes 2.0 seconds (as opposed to 0.8 seconds for the default firmware).
 
 ## Compiling and Uploading
 
