@@ -77,7 +77,7 @@ THE SOFTWARE.
 #define PERIOD_MAX  2000              // ms
 
 // ACCELERATION CONTROL
-#define MAX_ACCEL   (HALF_RANGE/0.8f) // us/s
+#define MAX_ACCEL   (HALF_RANGE/2.0f) // us/s
 
 // PWM UPDATE RATE
 #define UPDATE_DT   0.050f            // s
